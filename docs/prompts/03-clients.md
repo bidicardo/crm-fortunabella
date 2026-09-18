@@ -48,6 +48,11 @@
   layout `resources/views/layouts/app.blade.php`; маршруты через
   `Route::livewire(...)` в группе `auth` файла `routes/web.php`
   (как уже сделано для `/users`).
+- Маршруты страниц клиентов именованные: `clients.index` (список),
+  `clients.create`, `clients.show`, `clients.edit`. Левое меню находит
+  пункт «Клиенты» по имени `clients.index` (`config/navigation.php`,
+  Фаза 1а). У каждой страницы задаётся #[Title('...')] — это название
+  раздела в верхней панели.
 - Новые миграции — отдельными файлами, существующие не менять;
   должны работать и на MySQL (Sail), и на SQLite (тесты).
 - Тесты — Pest, SQLite in-memory, только фабрики и выдуманные данные.
