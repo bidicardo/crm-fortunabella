@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LogoutController;
+use App\Http\Middleware\EnsureUserIsNotBlocked;
 use App\Livewire\AcceptInvite;
 use App\Livewire\Home;
 use App\Livewire\Login;
@@ -12,7 +13,7 @@ Route::livewire('/login', Login::class)->middleware('guest')->name('login');
 // Лимит на страницу приглашения — чтобы токены нельзя было перебирать.
 Route::livewire('/invite/{token}', AcceptInvite::class)->middleware(['guest', 'throttle:10,1'])->name('invite.accept');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/', Home::class);
     Route::livewire('/users', Users::class)->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');

@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -41,5 +43,20 @@ class User extends Authenticatable
     public function isBlocked(): bool
     {
         return $this->blocked_at !== null;
+    }
+
+    /**
+     * Блокирует учётную запись и сразу завершает все её сессии, включая «запомнить меня».
+     */
+    public function block(): void
+    {
+        $this->forceFill(['blocked_at' => now(), 'remember_token' => Str::random(60)])->save();
+
+        DB::table(config('session.table', 'sessions'))->where('user_id', $this->id)->delete();
+    }
+
+    public function unblock(): void
+    {
+        $this->forceFill(['blocked_at' => null])->save();
     }
 }

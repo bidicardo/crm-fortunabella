@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Invite;
+use App\Models\User;
 use Livewire\Component;
 
 class Users extends Component
@@ -17,10 +18,29 @@ class Users extends Component
         $this->inviteUrl = route('invite.accept', $token);
     }
 
+    public function block(int $id): void
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->isCreator() || $user->is(auth()->user())) {
+            $this->addError('users', 'Создателя и самого себя заблокировать нельзя.');
+
+            return;
+        }
+
+        $user->block();
+    }
+
+    public function unblock(int $id): void
+    {
+        User::findOrFail($id)->unblock();
+    }
+
     public function render()
     {
         return view('livewire.users', [
             'invites' => Invite::with('creator')->latest()->get(),
+            'users' => User::orderBy('id')->get(),
         ]);
     }
 }

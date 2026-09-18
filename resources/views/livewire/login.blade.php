@@ -1,6 +1,10 @@
 <div class="mx-auto max-w-sm space-y-4">
     <h1 class="text-2xl font-bold">Вход</h1>
 
+    @if (session('blocked'))
+        <p class="rounded-md border border-red-300 p-3 text-sm text-red-600 dark:text-red-400">{{ session('blocked') }}</p>
+    @endif
+
     <form wire:submit="login" class="space-y-4">
         <div>
             <label for="email" class="mb-1 block text-sm">Email</label>
