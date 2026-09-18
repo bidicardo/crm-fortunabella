@@ -24,6 +24,14 @@
             class="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700"
         >
             <span class="font-semibold">{{ config('app.name') }}</span>
+            <div class="flex items-center gap-3">
+            @auth
+                <span class="text-sm">{{ auth()->user()->name }}</span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600">Выйти</button>
+                </form>
+            @endauth
             <button
                 type="button"
                 class="rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600"
@@ -34,6 +42,7 @@
                 "
                 x-text="dark ? 'Светлая тема' : 'Тёмная тема'"
             ></button>
+            </div>
         </header>
 
         <main class="mx-auto max-w-3xl p-4">

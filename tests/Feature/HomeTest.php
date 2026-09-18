@@ -1,10 +1,11 @@
 <?php
 
 use App\Livewire\Home;
+use App\Models\User;
 use Livewire\Livewire;
 
 it('renders the home page with the Livewire component', function () {
-    $this->get('/')->assertOk()->assertSeeLivewire(Home::class);
+    $this->actingAs(User::factory()->create())->get('/')->assertOk()->assertSeeLivewire(Home::class);
 });
 
 it('increments the counter', function () {
