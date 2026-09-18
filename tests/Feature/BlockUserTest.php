@@ -64,15 +64,12 @@ it('does not let a blocked user log in, but lets them in after unblocking', func
     $this->assertAuthenticatedAs($member);
 });
 
-it('does not allow blocking the creator or yourself', function () {
+it('does not allow blocking the creator, including yourself', function () {
     $creator = User::factory()->creator()->create();
-    $member = User::factory()->create();
 
-    Livewire::actingAs($member)->test(Users::class)->call('block', $creator->id)->assertHasErrors(['users']);
-    Livewire::actingAs($member)->test(Users::class)->call('block', $member->id)->assertHasErrors(['users']);
     Livewire::actingAs($creator)->test(Users::class)->call('block', $creator->id)->assertHasErrors(['users']);
 
-    expect($creator->fresh()->isBlocked())->toBeFalse()->and($member->fresh()->isBlocked())->toBeFalse();
+    expect($creator->fresh()->isBlocked())->toBeFalse();
 });
 
 it('lists users with their role and status', function () {

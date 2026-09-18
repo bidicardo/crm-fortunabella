@@ -15,6 +15,6 @@ Route::livewire('/invite/{token}', AcceptInvite::class)->middleware(['guest', 't
 
 Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/', Home::class);
-    Route::livewire('/users', Users::class)->name('users');
+    Route::livewire('/users', Users::class)->middleware('can:manage-users')->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');
 });

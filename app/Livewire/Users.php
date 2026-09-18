@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Invite;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 
 class Users extends Component
@@ -13,6 +14,8 @@ class Users extends Component
 
     public function createInvite(): void
     {
+        Gate::authorize('manage-users');
+
         [, $token] = Invite::issue(auth()->user());
 
         $this->inviteUrl = route('invite.accept', $token);
@@ -20,6 +23,8 @@ class Users extends Component
 
     public function block(int $id): void
     {
+        Gate::authorize('manage-users');
+
         $user = User::findOrFail($id);
 
         if ($user->isCreator() || $user->is(auth()->user())) {
@@ -33,6 +38,8 @@ class Users extends Component
 
     public function unblock(int $id): void
     {
+        Gate::authorize('manage-users');
+
         User::findOrFail($id)->unblock();
     }
 
