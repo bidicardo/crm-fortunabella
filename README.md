@@ -9,11 +9,42 @@
 PHP 8.4 + Laravel 13. Подробности и обоснование — в
 `docs/25-architecture-proposal.md`.
 
+## Как поднять проект локально через Sail (рекомендуется)
+
+Laravel Sail — Docker-окружение (PHP 8.4 + MySQL 8.4 + Mailpit) только
+для компьютера разработчика. На продакшене (REG.RU) Docker не
+используется, см. `docs/23-hosting-constraints.md`.
+
+Нужны Docker Desktop и WSL2. Команды ниже — для Linux/macOS/WSL2:
+
+```
+cp .env.example .env
+./vendor/bin/sail up -d              # поднять окружение
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate    # миграции в MySQL
+./vendor/bin/sail artisan test       # тесты
+./vendor/bin/sail down               # остановить
+```
+
+Приложение: http://localhost, письма (Mailpit): http://localhost:8025,
+MySQL с хоста: `127.0.0.1:3306`.
+
+Скрипт `sail` не работает в Git Bash/PowerShell на Windows — там
+запускайте `docker compose` напрямую (после `sail up` те же команды):
+
+```
+$env:WWWUSER=1000; $env:WWWGROUP=1000     # PowerShell
+docker compose up -d
+docker compose exec laravel.test php artisan migrate
+docker compose exec laravel.test php artisan test
+docker compose down
+```
+
+Тесты (`phpunit.xml`) используют SQLite in-memory и не требуют MySQL.
+
 ## Как поднять проект локально (без Sail)
 
-Пока не настроено Laravel Sail (появится отдельной задачей, см.
-`docs/prompts/01-bootstrap.md`, задача 2), проект можно поднять
-напрямую через локально установленные PHP и Composer:
+Альтернатива — напрямую через локально установленные PHP и Composer:
 
 1. Установить PHP 8.4 (или 8.5.7 alt — если 8.4 недоступна, см.
    `docs/23-hosting-constraints.md`) и Composer.
