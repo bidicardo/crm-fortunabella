@@ -1,6 +1,4 @@
-<div class="space-y-6">
-    <h1 class="text-2xl font-bold">Пользователи</h1>
-
+<div class="max-w-3xl space-y-6">
     <section class="space-y-3">
         <h2 class="text-lg font-semibold">Сотрудники</h2>
 

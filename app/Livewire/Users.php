@@ -5,8 +5,10 @@ namespace App\Livewire;
 use App\Models\Invite;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Пользователи')]
 class Users extends Component
 {
     // Полная ссылка живёт только в состоянии страницы: после перезагрузки восстановить её нельзя.
