@@ -74,6 +74,26 @@ docker compose down
    php artisan serve
    ```
 
+## Фронтенд (Tailwind + Alpine.js + Livewire)
+
+Нужен Node.js (только на компьютере разработчика). Livewire уже
+содержит Alpine.js — отдельно его подключать не нужно.
+
+```
+npm install          # один раз
+npm run dev          # разработка с горячей перезагрузкой
+npm run build        # сборка в public/build
+```
+
+На продакшене (REG.RU) Node.js нет: ассеты собираются локально или в CI
+командой `npm run build`, а готовая папка `public/build` заливается на
+хостинг вместе с PHP-кодом (`docs/23-hosting-constraints.md`, «Деплой»).
+Папка `public/build` в Git не хранится.
+
+Тёмная тема: класс `dark` на `<html>` (Tailwind `dark:`-варианты),
+переключатель в шапке `resources/views/layouts/app.blade.php` хранит
+выбор в `localStorage`, по умолчанию — системная тема.
+
 ## Переменные окружения
 
 Актуальный список — в `.env.example`. Ключевые моменты:
