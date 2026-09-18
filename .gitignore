@@ -12,7 +12,8 @@ __pycache__/
 *.pyc
 
 # Логи, временные данные, загруженные документы
-storage/
+# (storage/ не игнорируется блоком — Laravel сам держит структуру папок
+# через вложенные .gitignore и игнорирует их содержимое, см. раздел Laravel ниже)
 uploads/
 backups/
 *.log
@@ -24,3 +25,16 @@ database/*.sqlite
 .idea/
 .vscode/
 .DS_Store
+
+# Laravel
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+.phpunit.cache/
+.phpunit.result.cache
+auth.json
+Homestead.json
+Homestead.yaml
+Thumbs.db
