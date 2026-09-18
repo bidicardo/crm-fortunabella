@@ -117,7 +117,19 @@ composer check
 
 В Sail: `docker compose exec laravel.test composer check`
 (или `./vendor/bin/sail composer check` в WSL2).
-Автоисправить стиль: `vendor/bin/pint`. Только тесты: `php artisan test`.
+Отдельно:
+
+```
+vendor/bin/pint            # отформатировать код (автоисправление)
+vendor/bin/pint --test     # только проверить стиль
+vendor/bin/pest            # запустить тесты (Pest)
+vendor/bin/pest --filter=Home   # один тест по имени
+```
+
+Тесты: Pest, SQLite in-memory (`phpunit.xml`), MySQL не нужен.
+Feature-тесты лежат в `tests/Feature` (с Laravel `TestCase`, см.
+`tests/Pest.php`), unit-тесты — в `tests/Unit`. Образцы —
+`tests/Feature/HomeTest.php` и `tests/Unit/ExampleTest.php`.
 
 ## Документация требований
 
