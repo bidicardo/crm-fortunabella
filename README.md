@@ -86,11 +86,18 @@ docker compose down
 - Реальные секреты (токены, пароли) никогда не хранятся в `.env.example`
   и не коммитятся — только в локальном `.env`, который в Git не входит.
 
-## Тесты
+## Проверка перед коммитом
+
+Перед каждым коммитом запускать одну команду — линтер (Pint, без
+автоисправления) и тесты:
 
 ```
-php artisan test
+composer check
 ```
+
+В Sail: `docker compose exec laravel.test composer check`
+(или `./vendor/bin/sail composer check` в WSL2).
+Автоисправить стиль: `vendor/bin/pint`. Только тесты: `php artisan test`.
 
 ## Документация требований
 
