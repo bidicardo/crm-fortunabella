@@ -1,0 +1,26 @@
+# Секреты и настройки окружения
+.env
+.env.*
+!.env.example
+
+# Зависимости
+node_modules/
+vendor/
+
+# Python
+__pycache__/
+*.pyc
+
+# Логи, временные данные, загруженные документы
+storage/
+uploads/
+backups/
+*.log
+
+# Локальные базы данных
+database/*.sqlite
+
+# Настройки редакторов и ОС
+.idea/
+.vscode/
+.DS_Store
