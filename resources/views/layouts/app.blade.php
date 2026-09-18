@@ -26,6 +26,7 @@
             <span class="font-semibold">{{ config('app.name') }}</span>
             <div class="flex items-center gap-3">
             @auth
+                <a href="{{ route('users') }}" class="text-sm underline">Пользователи</a>
                 <span class="text-sm">{{ auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
