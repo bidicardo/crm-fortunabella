@@ -19,7 +19,8 @@
 ## Д1а — Спецификация, палитра, шрифты, иконки, компоненты
 
 ```
-Прочитай CLAUDE.md, docs/26-ui-designe-plan.md (раздел «Д1»),
+Прочитай CLAUDE.md, docs/design/01-themes.md (решения по тёмной и светлой
+темам), docs/26-ui-designe-plan.md (раздел «Д1»),
 docs/16-pwa-and-mobile.md (правила вёрстки для iPhone),
 docs/17-ui-screens.md, docs/design/README.md и все файлы
 docs/design/refs/01-design-system-*. Посмотри текущий resources/css/app.css,
