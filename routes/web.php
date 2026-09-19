@@ -4,6 +4,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Middleware\EnsureUserIsNotBlocked;
 use App\Livewire\AcceptInvite;
 use App\Livewire\ClientForm;
+use App\Livewire\ClientMerge;
 use App\Livewire\ClientShow;
 use App\Livewire\ClientTable;
 use App\Livewire\Home;
@@ -23,6 +24,7 @@ Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/clients/create', ClientForm::class)->name('clients.create');
     Route::livewire('/clients/{client}', ClientShow::class)->name('clients.show');
     Route::livewire('/clients/{client}/edit', ClientForm::class)->name('clients.edit');
+    Route::livewire('/clients/{client}/merge', ClientMerge::class)->name('clients.merge');
     Route::livewire('/users', Users::class)->middleware('can:manage-users')->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');
 });

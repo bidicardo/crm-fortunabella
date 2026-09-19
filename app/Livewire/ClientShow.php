@@ -11,6 +11,8 @@ class ClientShow extends Component
 
     public function render()
     {
+        $this->client->loadMissing('mergedInto', 'mergedBy');
+
         return view('livewire.client-show')->title('Клиент');
     }
 }

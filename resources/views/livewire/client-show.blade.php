@@ -15,13 +15,23 @@
     @endif
 
     @if ($client->isArchived())
-        <p class="rounded-md border border-amber-400 bg-amber-50 p-3 text-sm dark:bg-slate-800">Карточка архивирована. Она доступна только для чтения.</p>
+        <div class="space-y-1 rounded-md border border-amber-400 bg-amber-50 p-3 text-sm dark:bg-slate-800">
+            <p>Карточка архивирована. Она доступна только для чтения.</p>
+            @if ($client->mergedInto)
+                <p>
+                    Влит в клиента <a href="{{ route('clients.show', $client->mergedInto) }}" class="font-medium underline">{{ $client->mergedInto->name }}</a>@if ($client->mergedBy), {{ $client->mergedBy->name }}@endif, {{ $client->merged_at->format('d.m.Y H:i') }}.
+                </p>
+            @endif
+        </div>
     @endif
 
     <div class="flex items-start justify-between gap-3">
         <h1 class="break-words text-2xl font-bold">{{ $client->name }}</h1>
         @unless ($client->isArchived())
-            <a href="{{ route('clients.edit', $client) }}" class="shrink-0 rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600">Редактировать</a>
+            <div class="flex shrink-0 flex-wrap justify-end gap-2">
+                <a href="{{ route('clients.merge', $client) }}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600">Объединить с…</a>
+                <a href="{{ route('clients.edit', $client) }}" class="rounded-md border border-slate-300 px-3 py-1.5 text-sm dark:border-slate-600">Редактировать</a>
+            </div>
         @endunless
     </div>
 

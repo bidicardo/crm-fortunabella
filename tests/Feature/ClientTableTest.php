@@ -89,7 +89,8 @@ it('hides archived clients unless asked', function () {
     Client::factory()->archived()->create(['name' => 'Архивный']);
 
     Livewire::test(ClientTable::class)->assertSee('Активный')->assertDontSee('Архивный')
-        ->set('showArchived', true)->assertSee('Активный')->assertSee('Архивный');
+        ->set('onlyArchived', true)->assertSee('Архивный')->assertDontSee('Активный')
+        ->set('onlyArchived', false)->assertSee('Активный')->assertDontSee('Архивный');
 });
 
 it('paginates by 25', function () {

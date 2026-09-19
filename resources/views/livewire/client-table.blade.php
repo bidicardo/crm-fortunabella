@@ -36,7 +36,7 @@
         </select>
 
         <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" wire:model.live="showArchived"> Показывать архивные
+            <input type="checkbox" wire:model.live="onlyArchived"> Только архивные
         </label>
 
         <div class="relative" x-on:keydown.escape.window="open = false" x-on:click.outside="open = false">

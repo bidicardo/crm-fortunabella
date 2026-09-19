@@ -24,7 +24,7 @@ class ClientTable extends Component
     public string $legalType = '';
 
     #[Url(as: 'archived')]
-    public bool $showArchived = false;
+    public bool $onlyArchived = false;
 
     #[Url]
     public string $sort = 'created_at';
@@ -42,7 +42,7 @@ class ClientTable extends Component
         $this->resetPage();
     }
 
-    public function updatedShowArchived(): void
+    public function updatedOnlyArchived(): void
     {
         $this->resetPage();
     }
@@ -58,28 +58,6 @@ class ClientTable extends Component
         $this->resetPage();
     }
 
-    /** Подстрока без учёта регистра (в MySQL — за счёт collation); %, _ и ! из запроса экранируются. */
-    private function applySearch(Builder $query, string $term): void
-    {
-        $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term).'%';
-
-        $query->where(function (Builder $q) use ($like, $term) {
-            foreach (['name', 'email', 'social', 'role'] as $column) {
-                $q->orWhereRaw("$column like ? escape '!'", [$like]);
-            }
-
-            // Запрос из одних цифр и знаков номера ищем и по нормализованному телефону: 8 → 7.
-            if (preg_match('/^[\d\s+()\-]+$/', $term)) {
-                $digits = preg_replace('/\D/', '', $term);
-                $digits = str_starts_with($digits, '8') ? '7'.substr($digits, 1) : $digits;
-
-                if ($digits !== '') {
-                    $q->orWhere('phone', 'like', "%$digits%");
-                }
-            }
-        });
-    }
-
     public function render()
     {
         $term = trim($this->search);
@@ -87,9 +65,9 @@ class ClientTable extends Component
         $dir = $this->dir === 'asc' ? 'asc' : 'desc';
 
         $clients = Client::query()
-            ->when(! $this->showArchived, fn (Builder $q) => $q->active())
+            ->when($this->onlyArchived, fn (Builder $q) => $q->whereNotNull('archived_at'), fn (Builder $q) => $q->active())
             ->when(ClientLegalType::tryFrom($this->legalType), fn (Builder $q, ClientLegalType $type) => $q->where('legal_type', $type))
-            ->when($term !== '', fn (Builder $q) => $this->applySearch($q, $term))
+            ->when($term !== '', fn (Builder $q) => $q->search($term))
             ->orderBy($sort, $dir)
             ->orderBy('id', $dir)
             ->paginate(25);
