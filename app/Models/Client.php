@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ClientLegalType;
+use App\Models\Concerns\LogsActivity;
 use App\Services\PhoneNormalizer;
 use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected function casts(): array
     {
@@ -60,6 +61,35 @@ class Client extends Model
                 }
             }
         });
+    }
+
+    public function activityLabels(): array
+    {
+        return [
+            'name' => 'Имя',
+            'phone' => 'Телефон',
+            'email' => 'Email',
+            'social' => 'Соцсеть / мессенджер',
+            'legal_type' => 'Тип клиента',
+            'role' => 'Роль',
+            'contact_time' => 'Удобное время для связи',
+            'notes' => 'Примечания',
+        ];
+    }
+
+    // Архивация и слияние описываются событием merged, отдельными записями updated их не дублируем.
+    public function activityIgnored(): array
+    {
+        return ['archived_at', 'merged_into_id', 'merged_by', 'merged_at'];
+    }
+
+    public function activityValue(string $field, mixed $value): ?string
+    {
+        if ($field === 'legal_type' && filled($value)) {
+            return ClientLegalType::tryFrom($value)?->label() ?? $value;
+        }
+
+        return filled($value) ? (string) $value : null;
     }
 
     public function isArchived(): bool

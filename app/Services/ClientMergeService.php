@@ -76,6 +76,15 @@ class ClientMergeService
                 'merged_by' => $by->id,
                 'merged_at' => now(),
             ])->save();
+
+            // История: на основной карточке — «влит клиент X» (с выбранными значениями), на дубле — «влит в клиента Y».
+            $main->logActivity('merged', [
+                'merged_client' => ['id' => $duplicate->id, 'name' => $duplicate->name],
+                'values' => $values,
+            ], $by->id);
+            $duplicate->logActivity('merged', [
+                'merged_into' => ['id' => $main->id, 'name' => $main->name],
+            ], $by->id);
         });
     }
 
