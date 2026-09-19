@@ -57,7 +57,12 @@
                         class="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm dark:border-slate-600"
                         x-on:focus="$el.select()">
                     <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-600"
-                        x-on:click="navigator.clipboard.writeText($refs.url.value); copied = true">
+                        x-on:click="
+                            // На http (не HTTPS) navigator.clipboard недоступен — копируем через выделение.
+                            if (navigator.clipboard) { navigator.clipboard.writeText($refs.url.value); }
+                            else { $refs.url.select(); document.execCommand('copy'); }
+                            copied = true;
+                        ">
                         <span x-text="copied ? 'Скопировано' : 'Копировать'"></span>
                     </button>
                 </div>

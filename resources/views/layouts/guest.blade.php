@@ -3,8 +3,8 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-        <div class="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 p-4">
+    <body class="min-h-dvh bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+        <div class="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center gap-6 p-4">
             <p class="text-center text-xl font-semibold">{{ config('app.name') }}</p>
 
             {{ $slot }}

@@ -47,3 +47,60 @@ it('does not show the sidebar on login and invite pages', function () {
     $this->get('/login')->assertOk()->assertDontSee('Основное меню')->assertSee('Тёмная тема', false);
     $this->get('/invite/bad-token')->assertNotFound()->assertDontSee('Основное меню');
 });
+
+function addRoutes(string ...$names): void
+{
+    foreach ($names as $name) {
+        Route::middleware('web')->get('/'.str_replace('.', '-', $name), fn () => Blade::render('<x-layouts::app>x</x-layouts::app>'))->name($name);
+    }
+    Route::getRoutes()->refreshNameLookups();
+}
+
+it('has a bottom bar with Home and no tabs for missing routes', function () {
+    $this->actingAs(User::factory()->create())->get('/')
+        ->assertSee('aria-label="Нижнее меню"', false)
+        ->assertSee('viewport-fit=cover', false)
+        ->assertDontSee('Ещё')
+        ->assertDontSee('Задачи');
+});
+
+it('shows tabs and More when routes appear', function () {
+    addRoutes('deals.index', 'clients.index', 'tasks.index', 'calendar.index', 'documents.index');
+
+    $this->actingAs(User::factory()->create())->get('/')
+        ->assertSee('Сделки')
+        ->assertSee('Клиенты')
+        ->assertSee('Задачи')
+        ->assertSee('Ещё')
+        ->assertSee('Календарь')
+        ->assertSee('Документы');
+});
+
+it('hides More when there are no extra sections', function () {
+    addRoutes('deals.index', 'clients.index', 'tasks.index');
+
+    $this->actingAs(User::factory()->create())->get('/')->assertDontSee('Ещё');
+});
+
+it('marks the active tab in the bottom bar', function () {
+    addRoutes('clients.index');
+
+    $html = $this->actingAs(User::factory()->create())->get('/clients-index')->getContent();
+    $bottom = substr($html, strpos($html, 'aria-label="Нижнее меню"'));
+
+    expect($bottom)->toContain('aria-current="page"');
+});
+
+it('does not show the bottom bar on guest pages', function () {
+    $this->get('/login')->assertDontSee('Нижнее меню');
+    $this->get('/invite/bad-token')->assertDontSee('Нижнее меню');
+});
+
+it('does not duplicate Users in More', function () {
+    addRoutes('calendar.index');
+
+    $html = $this->actingAs(User::factory()->creator()->create())->get('/')->getContent();
+    $bottom = substr($html, strpos($html, 'aria-label="Нижнее меню"'));
+
+    expect($bottom)->toContain('Календарь')->not->toContain(route('users'));
+});
