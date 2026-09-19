@@ -39,7 +39,19 @@ CRM для управления клиентами, сделками-мероп�
 - PHP 8.4 (локально 8.4.22), Laravel 13, Livewire 4 (в комплекте Alpine.js),
   Tailwind 4, Pest 4, MySQL/MariaDB; тесты идут на SQLite in-memory.
 - Интерфейс на русском. Страницы — Livewire-компоненты в `app/Livewire`,
-  маршруты `Route::livewire(...)`, общий layout `resources/views/layouts/app.blade.php`.
+  маршруты `Route::livewire(...)`, общий layout `resources/views/layouts/app.blade.php`
+  (каркас с меню); страницы входа и приглашения — `layouts/guest.blade.php`.
+- Меню, нижняя панель и правило стрелки «Назад» берутся из одного файла
+  `config/navigation.php` через класс `Navigation` (`app/Support`); пункт появляется,
+  когда существует именованный маршрут (`clients.index` и т. п.). У каждой страницы
+  задаётся `#[Title('...')]` — название раздела в верхней панели.
+- Общие сервисы: `PhoneNormalizer` (телефон), `DuplicateFinder` (поиск дублей),
+  `ClientMergeService` (слияние; связи для переноса — `relations()`), трейт
+  `LogsActivity` (история изменений моделей).
+- Вёрстка для iPhone (шрифт полей 16 px, `min-h-dvh`, безопасная зона, без
+  горизонтальной прокрутки страницы) — `docs/16-pwa-and-mobile.md`.
+- Ход выполнения задач и фаз — `docs/25-architecture-proposal.md` (раздел
+  «Статус выполнения»).
 - Проверка перед коммитом: `composer check` (Pint без автофикса + тесты).
 - Локальное окружение — Sail (Docker); на Windows скрипт `sail` не работает,
   используй `docker compose exec laravel.test <команда>` (перед `docker compose`
