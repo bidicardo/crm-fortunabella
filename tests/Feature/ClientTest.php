@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\ClientLegalType;
-use App\Enums\ClientRole;
 use App\Models\Client;
 
 it('creates a client with only a name', function () {
@@ -16,14 +15,12 @@ it('creates a client with only a name', function () {
         ->archived_at->toBeNull();
 });
 
-it('casts legal type and role to enums with Russian labels', function () {
-    $client = Client::factory()->organization()->create()->fresh();
+it('casts legal type to an enum and keeps role as free text', function () {
+    $client = Client::factory()->organization()->create(['role' => 'Свадебный организатор из агентства'])->fresh();
 
     expect($client->legal_type)->toBe(ClientLegalType::Organization)
         ->and($client->legal_type->label())->toBe('Организация')
-        ->and($client->role)->toBe(ClientRole::Organizer)
-        ->and($client->role->label())->toBe('Организатор')
-        ->and(ClientRole::Bride->label())->toBe('Невеста');
+        ->and($client->role)->toBe('Свадебный организатор из агентства');
 });
 
 it('scopes active clients', function () {

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\ClientLegalType;
-use App\Enums\ClientRole;
 use App\Services\PhoneNormalizer;
 use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -23,7 +22,6 @@ class Client extends Model
     {
         return [
             'legal_type' => ClientLegalType::class,
-            'role' => ClientRole::class,
             'archived_at' => 'datetime',
         ];
     }

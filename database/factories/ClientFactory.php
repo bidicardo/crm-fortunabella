@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Enums\ClientLegalType;
-use App\Enums\ClientRole;
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +21,7 @@ class ClientFactory extends Factory
             'phone' => '+79'.fake()->numerify('#########'),
             'email' => fake()->safeEmail(),
             'legal_type' => ClientLegalType::Individual,
-            'role' => ClientRole::PrivateCustomer,
+            'role' => 'Частный заказчик',
         ];
     }
 
@@ -31,7 +30,7 @@ class ClientFactory extends Factory
         return $this->state(fn () => [
             'name' => fake()->company(),
             'legal_type' => ClientLegalType::Organization,
-            'role' => ClientRole::Organizer,
+            'role' => 'Организатор',
         ]);
     }
 
