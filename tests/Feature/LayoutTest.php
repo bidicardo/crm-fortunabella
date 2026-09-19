@@ -8,16 +8,16 @@ it('shows only existing sections in the menu', function () {
         ->assertOk()
         ->assertSee('aria-label="Основное меню"', false)
         ->assertSee('Главная')
-        ->assertDontSee('Сделки')
-        ->assertDontSee('Клиенты');
+        ->assertSee('Клиенты')
+        ->assertDontSee('Сделки');
 });
 
 it('shows a menu item when its route appears', function () {
-    Route::middleware('web')->get('/clients', fn () => 'ok')->name('clients.index');
+    Route::middleware('web')->get('/deals', fn () => 'ok')->name('deals.index');
     Route::getRoutes()->refreshNameLookups();
 
     $this->actingAs(User::factory()->create())->get('/')
-        ->assertSee('Клиенты')
+        ->assertSee('Сделки')
         ->assertSee('Продажи');
 });
 
@@ -65,7 +65,7 @@ it('has a bottom bar with Home and no tabs for missing routes', function () {
 });
 
 it('shows tabs and More when routes appear', function () {
-    addRoutes('deals.index', 'clients.index', 'tasks.index', 'calendar.index', 'documents.index');
+    addRoutes('deals.index', 'tasks.index', 'calendar.index', 'documents.index');
 
     $this->actingAs(User::factory()->create())->get('/')
         ->assertSee('Сделки')
@@ -77,15 +77,15 @@ it('shows tabs and More when routes appear', function () {
 });
 
 it('hides More when there are no extra sections', function () {
-    addRoutes('deals.index', 'clients.index', 'tasks.index');
+    addRoutes('deals.index', 'tasks.index');
 
     $this->actingAs(User::factory()->create())->get('/')->assertDontSee('Ещё');
 });
 
 it('marks the active tab in the bottom bar', function () {
-    addRoutes('clients.index');
+    addRoutes('deals.index');
 
-    $html = $this->actingAs(User::factory()->create())->get('/clients-index')->getContent();
+    $html = $this->actingAs(User::factory()->create())->get('/deals-index')->getContent();
     $bottom = substr($html, strpos($html, 'aria-label="Нижнее меню"'));
 
     expect($bottom)->toContain('aria-current="page"');
@@ -103,4 +103,14 @@ it('does not duplicate Users in More', function () {
     $bottom = substr($html, strpos($html, 'aria-label="Нижнее меню"'));
 
     expect($bottom)->toContain('Календарь')->not->toContain(route('users'));
+});
+
+it('shows the back arrow to the parent section, and not on the home page', function () {
+    $user = User::factory()->creator()->create();
+
+    $this->actingAs($user)->get('/')->assertDontSee('aria-label="Назад"', false);
+    $this->actingAs($user)->get('/users')->assertSee('aria-label="Назад"', false);
+    $html = $this->actingAs($user)->get('/clients/create')->getContent();
+
+    expect($html)->toMatch('~href="'.preg_quote(route('clients.index'), '~').'"\s+aria-label="Назад"~u');
 });

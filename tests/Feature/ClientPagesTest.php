@@ -96,3 +96,12 @@ it('escapes the name on the card', function () {
         ->assertDontSee('<script>alert(1)</script>', false)
         ->assertSee('&lt;script&gt;alert(1)&lt;/script&gt;', false);
 });
+
+it('titles the card "Клиент" in the top bar and shows the name only in the heading', function () {
+    $client = Client::factory()->create(['name' => 'Иван Олегович']);
+
+    $this->get(route('clients.show', $client))
+        ->assertSee('<span class="truncate text-lg font-semibold">Клиент</span>', false)
+        ->assertSee('<title>Клиент — '.config('app.name').'</title>', false)
+        ->assertSee('Иван Олегович');
+});

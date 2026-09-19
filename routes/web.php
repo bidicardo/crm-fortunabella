@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureUserIsNotBlocked;
 use App\Livewire\AcceptInvite;
 use App\Livewire\ClientForm;
 use App\Livewire\ClientShow;
+use App\Livewire\ClientTable;
 use App\Livewire\Home;
 use App\Livewire\Login;
 use App\Livewire\Users;
@@ -17,7 +18,8 @@ Route::livewire('/invite/{token}', AcceptInvite::class)->middleware(['guest', 't
 
 Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/', Home::class)->name('home');
-    // Список клиентов (clients.index) — задача 16; create объявлен раньше {client}, чтобы не считаться id.
+    // create объявлен раньше {client}, чтобы «create» не считался id.
+    Route::livewire('/clients', ClientTable::class)->name('clients.index');
     Route::livewire('/clients/create', ClientForm::class)->name('clients.create');
     Route::livewire('/clients/{client}', ClientShow::class)->name('clients.show');
     Route::livewire('/clients/{client}/edit', ClientForm::class)->name('clients.edit');

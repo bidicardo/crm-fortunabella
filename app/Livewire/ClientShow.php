@@ -11,6 +11,6 @@ class ClientShow extends Component
 
     public function render()
     {
-        return view('livewire.client-show')->title($this->client->name);
+        return view('livewire.client-show')->title('Клиент');
     }
 }

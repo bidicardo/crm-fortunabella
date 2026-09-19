@@ -12,18 +12,18 @@ function itemLabels(): array
 }
 
 it('hides items whose route does not exist and drops empty groups', function () {
-    expect(itemLabels())->toBe(['Главная']);
-    expect(Navigation::groups())->toHaveCount(1);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты']);
+    expect(Navigation::groups())->toHaveCount(2);
 });
 
 it('shows a group once one of its routes exists', function () {
-    Route::get('/clients', fn () => '')->name('clients.index');
+    Route::get('/tasks', fn () => '')->name('tasks.index');
     Route::getRoutes()->refreshNameLookups();
 
     $groups = Navigation::groups();
 
-    expect(itemLabels())->toBe(['Главная', 'Клиенты']);
-    expect($groups[1]['label'])->toBe('Продажи');
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Задачи']);
+    expect($groups[2]['label'])->toBe('Работа');
 });
 
 it('marks only the current item as active', function () {
@@ -37,3 +37,21 @@ it('marks only the current item as active', function () {
 
     expect($current)->toBe(['Действующие контрагенты']);
 });
+
+it('leads the back arrow to the parent section', function (string $uri, ?string $expected) {
+    Route::get('/clients', fn () => '')->name('clients.index');
+    Route::get('/clients/create', fn () => '')->name('clients.create');
+    Route::get('/clients/{id}', fn () => '')->name('clients.show');
+    Route::get('/users', fn () => '')->name('users');
+    Route::getRoutes()->refreshNameLookups();
+
+    $this->get($uri);
+
+    expect(Navigation::backUrl())->toBe($expected ? url($expected) : null);
+})->with([
+    'home has none' => ['/', null],
+    'list goes home' => ['/clients', '/'],
+    'create goes to list' => ['/clients/create', '/clients'],
+    'card goes to list' => ['/clients/5', '/clients'],
+    'users goes home' => ['/users', '/'],
+]);
