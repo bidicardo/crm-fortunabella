@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Enums\ClientLegalType;
 use App\Models\Client;
 use App\Rules\RussianPhone;
+use App\Services\DuplicateFinder;
+use App\Services\PhoneNormalizer;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -42,7 +44,18 @@ class ClientForm extends Component
         $this->legal_type = $client->legal_type?->value ?? '';
     }
 
-    public function save()
+    /** Найденные при создании возможные дубли: id клиента => совпавшие поля. */
+    public array $duplicates = [];
+
+    /** Телефон и email, для которых показано предупреждение: «Продолжить» действует только для них. */
+    public string $warnedFor = '';
+
+    private function duplicatesKey(): string
+    {
+        return (new PhoneNormalizer)->normalize($this->phone).'|'.mb_strtolower(trim($this->email));
+    }
+
+    public function save(bool $ignoreDuplicates = false)
     {
         abort_if($this->client?->isArchived(), 403);
 
@@ -56,6 +69,21 @@ class ClientForm extends Component
             'contact_time' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
+
+        // Предупреждение о дубле — только при создании; создание дубля не запрещено.
+        if (! $this->client && ! ($ignoreDuplicates && $this->warnedFor === $this->duplicatesKey())) {
+            $found = (new DuplicateFinder)->find($data['phone'], $data['email']);
+
+            if ($found->isNotEmpty()) {
+                $this->duplicates = $found->mapWithKeys(fn ($d) => [$d['client']->id => $d['matched']])->all();
+                $this->warnedFor = $this->duplicatesKey();
+
+                // Страница прокручивается наверх, чтобы панель была видна, даже если форма была пролистана вниз.
+                $this->dispatch('duplicates-found');
+
+                return;
+            }
+        }
 
         // Пустые строки из формы храним как null.
         $data = array_map(fn ($value) => $value === '' ? null : $value, $data);
@@ -72,6 +100,7 @@ class ClientForm extends Component
     {
         return view('livewire.client-form', [
             'legalTypes' => ClientLegalType::cases(),
+            'duplicateClients' => $this->duplicates ? Client::whereKey(array_keys($this->duplicates))->get() : collect(),
         ])->title($this->client ? 'Редактирование клиента' : 'Новый клиент');
     }
 }

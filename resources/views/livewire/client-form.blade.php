@@ -3,7 +3,28 @@
     $error = 'mt-1 text-sm text-red-600 dark:text-red-400';
 @endphp
 
-<form wire:submit="save" class="max-w-xl space-y-4">
+<form wire:submit="save" class="max-w-xl space-y-4" x-data x-on:duplicates-found.window="$nextTick(() => window.scrollTo({ top: 0, behavior: 'smooth' }))">
+    @if ($duplicateClients->isNotEmpty())
+        <div class="space-y-3 rounded-md border border-amber-400 bg-amber-50 p-3 dark:bg-slate-800" role="alert">
+            <p class="text-sm font-semibold">Возможно, такой клиент уже есть</p>
+
+            @foreach ($duplicateClients as $duplicate)
+                <div class="flex flex-wrap items-center justify-between gap-2 border-t border-amber-200 pt-2 text-sm dark:border-slate-700">
+                    <div class="min-w-0">
+                        <p class="break-words font-medium">{{ $duplicate->name }}</p>
+                        <p class="break-words text-slate-600 dark:text-slate-300">{{ collect([$duplicate->phone, $duplicate->email])->filter()->implode(' · ') }}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            Совпало: {{ collect($duplicates[$duplicate->id] ?? [])->map(fn ($f) => $f === 'phone' ? 'телефон' : 'email')->implode(', ') }}
+                        </p>
+                    </div>
+                    <a href="{{ route('clients.show', $duplicate) }}" class="shrink-0 rounded-md border border-slate-300 px-3 py-1.5 dark:border-slate-600">Открыть</a>
+                </div>
+            @endforeach
+
+            <button type="button" wire:click="save(true)" class="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-500">Продолжить создание</button>
+        </div>
+    @endif
+
     <div>
         <label for="name" class="mb-1 block text-sm">Имя *</label>
         <input id="name" type="text" wire:model="name" required class="{{ $input }}">
