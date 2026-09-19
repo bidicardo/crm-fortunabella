@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Enums\ClientLegalType;
 use App\Enums\ClientRole;
+use App\Services\PhoneNormalizer;
 use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,6 +26,13 @@ class Client extends Model
             'role' => ClientRole::class,
             'archived_at' => 'datetime',
         ];
+    }
+
+    // Телефон всегда хранится нормализованным; невалидное значение при прямом присвоении даёт null
+    // (отклоняет его на уровне формы правило RussianPhone).
+    protected function phone(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => (new PhoneNormalizer)->normalize($value));
     }
 
     public function scopeActive(Builder $query): void
