@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Invite;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -14,13 +15,29 @@ class Users extends Component
     // Полная ссылка живёт только в состоянии страницы: после перезагрузки восстановить её нельзя.
     public ?string $inviteUrl = null;
 
+    // Какому приглашению принадлежит показанная ссылка: при его деактивации ссылку прячем.
+    #[Locked]
+    public ?int $inviteId = null;
+
     public function createInvite(): void
     {
         Gate::authorize('manage-users');
 
-        [, $token] = Invite::issue(auth()->user());
+        [$invite, $token] = Invite::issue(auth()->user());
 
         $this->inviteUrl = route('invite.accept', $token);
+        $this->inviteId = $invite->id;
+    }
+
+    public function revokeInvite(int $id): void
+    {
+        Gate::authorize('manage-users');
+
+        Invite::findOrFail($id)->revoke();
+
+        if ($this->inviteId === $id) {
+            $this->reset('inviteUrl', 'inviteId');
+        }
     }
 
     public function block(int $id): void

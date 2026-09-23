@@ -29,6 +29,14 @@ it('forbids a member from creating invites', function () {
     expect(Invite::count())->toBe(0);
 });
 
+it('forbids a member from deactivating invites', function () {
+    $invite = Invite::factory()->create();
+
+    Livewire::actingAs(User::factory()->create())->test(Users::class)->call('revokeInvite', $invite->id)->assertForbidden();
+
+    expect($invite->fresh()->revoked_at)->toBeNull();
+});
+
 it('forbids a member from blocking users', function () {
     $member = User::factory()->create();
     $other = User::factory()->create();

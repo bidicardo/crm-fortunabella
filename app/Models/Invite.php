@@ -20,6 +20,7 @@ class Invite extends Model
         return [
             'expires_at' => 'datetime',
             'used_at' => 'datetime',
+            'revoked_at' => 'datetime',
         ];
     }
 
@@ -55,6 +56,7 @@ class Invite extends Model
     {
         return static::where('token_hash', static::hashToken($token))
             ->whereNull('used_at')
+            ->whereNull('revoked_at')
             ->where('expires_at', '>', now())
             ->first();
     }
@@ -66,6 +68,7 @@ class Invite extends Model
     {
         $updated = static::whereKey($this->getKey())
             ->whereNull('used_at')
+            ->whereNull('revoked_at')
             ->where('expires_at', '>', now())
             ->update(['used_at' => now(), 'user_id' => $user->id]);
 
@@ -74,6 +77,28 @@ class Invite extends Model
         }
 
         return $updated === 1;
+    }
+
+    /**
+     * Деактивирует ещё не использованное приглашение; true — только если оно было действующим.
+     * Условия в самом запросе: регистрация по ссылке в ту же секунду не проскочит.
+     */
+    public function revoke(): bool
+    {
+        $updated = static::whereKey($this->getKey())
+            ->whereNull('used_at')
+            ->whereNull('revoked_at')
+            ->where('expires_at', '>', now())
+            ->update(['revoked_at' => now()]);
+
+        $this->refresh();
+
+        return $updated === 1;
+    }
+
+    public function isActive(): bool
+    {
+        return ! $this->used_at && ! $this->revoked_at && $this->expires_at->isFuture();
     }
 
     private static function hashToken(string $token): string

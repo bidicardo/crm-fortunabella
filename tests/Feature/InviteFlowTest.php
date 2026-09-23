@@ -132,3 +132,41 @@ it('rate limits the invite page', function () {
 
     $this->get('/invite/guess-11')->assertStatus(429);
 });
+
+it('lets the creator deactivate an invite so its link stops working', function () {
+    $creator = User::factory()->creator()->create();
+
+    $component = Livewire::actingAs($creator)->test(Users::class)->call('createInvite');
+    $token = basename($component->get('inviteUrl'));
+    $invite = Invite::sole();
+
+    $component->assertSee('Деактивировать')
+        ->call('revokeInvite', $invite->id)
+        ->assertSet('inviteUrl', null)
+        ->assertSee('деактивировано')
+        ->assertDontSee('Деактивировать');
+
+    expect($invite->fresh()->revoked_at)->not->toBeNull()
+        ->and(Invite::findValid($token))->toBeNull();
+
+    // Страница приглашения — только для гостей, поэтому ссылку открывает уже не создатель.
+    Auth::logout();
+    $this->get("/invite/{$token}")->assertNotFound();
+});
+
+it('does not deactivate used or expired invites', function () {
+    $used = Invite::factory()->used()->create();
+    $expired = Invite::factory()->expired()->create();
+
+    expect($used->revoke())->toBeFalse()
+        ->and($expired->revoke())->toBeFalse()
+        ->and($used->fresh()->revoked_at)->toBeNull()
+        ->and($expired->fresh()->revoked_at)->toBeNull();
+});
+
+it('does not let a deactivated invite be used for registration', function () {
+    [$invite] = Invite::issue(User::factory()->creator()->create());
+    $invite->revoke();
+
+    expect($invite->markUsed(User::factory()->create()))->toBeFalse();
+});

@@ -98,26 +98,35 @@
                     <th class="{{ $th }}">Создано</th>
                     <th class="{{ $th }}">Кто создал</th>
                     <th class="{{ $th }}">Статус</th>
+                    <th class="{{ $th }}"><span class="sr-only">Действия</span></th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($invites as $invite)
-                    <tr class="border-t border-line">
+                    <tr wire:key="invite-{{ $invite->id }}" class="border-t border-line">
                         <td class="{{ $td }}">{{ $invite->created_at->format('d.m.Y H:i') }}</td>
                         <td class="{{ $td }}">{{ $invite->creator->name }}</td>
                         <td class="{{ $td }}">
                             @if ($invite->used_at)
                                 <x-ui.badge>использовано</x-ui.badge>
+                            @elseif ($invite->revoked_at)
+                                <x-ui.badge tone="error">деактивировано</x-ui.badge>
                             @elseif ($invite->expires_at->isPast())
                                 <x-ui.badge tone="warning">истекло</x-ui.badge>
                             @else
                                 <x-ui.badge tone="success">активно</x-ui.badge>
                             @endif
                         </td>
+                        <td class="{{ $td }} text-right">
+                            @if ($invite->isActive())
+                                <x-ui.button variant="secondary" wire:click="revokeInvite({{ $invite->id }})"
+                                    wire:confirm="Деактивировать приглашение? Ссылка перестанет работать.">Деактивировать</x-ui.button>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr class="border-t border-line">
-                        <td colspan="3" class="{{ $td }} text-ink-secondary">Приглашений пока нет.</td>
+                        <td colspan="4" class="{{ $td }} text-ink-secondary">Приглашений пока нет.</td>
                     </tr>
                 @endforelse
             </tbody>

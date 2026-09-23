@@ -64,9 +64,13 @@ select {
     --color-stage-done: #a34e0a;
     --color-stage-refused: #c62828;
 
-    /* Левое меню в светлой теме — коричневое, в цвет основной кнопки (решение владельца) */
-    --color-sidebar: #904d30;
-    --color-sidebar-hover: #7a3f26;
+    /* Левое меню в светлой теме — тёмно-коричневое (решение владельца): пункты — кнопки
+       на подложке item, активный пункт залит цветом основной кнопки, разделители — line */
+    --color-sidebar: #533727;
+    --color-sidebar-item: #614738;
+    --color-sidebar-hover: #6d5547;
+    --color-sidebar-current: #904d30;
+    --color-sidebar-line: #796357;
     --color-sidebar-ink: #f4e6dc;
     --color-sidebar-label: #e6dac8;
     --color-sidebar-active: #faf9f6;
@@ -136,7 +140,10 @@ select {
     --color-stage-refused: #f87171;
 
     --color-sidebar: #131516;
-    --color-sidebar-hover: #1b1f27;
+    --color-sidebar-item: #1b1f27;
+    --color-sidebar-hover: #262b36;
+    --color-sidebar-current: #162ba9;
+    --color-sidebar-line: #4a5568;
     --color-sidebar-ink: #a0aec0;
     --color-sidebar-label: #718096;
     --color-sidebar-active: #5d88f4;
