@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::livewire('/login', Login::class)->middleware('guest')->name('login');
 
+// Только локальная разработка (проверка в тесте, не по регистрации маршрута,
+// иначе смену окружения нельзя было бы проверить без перезапуска приложения).
+Route::get('/design-showcase', function () {
+    abort_unless(config('app.env') === 'local', 404);
+
+    return view('design-showcase');
+})->name('design-showcase');
+
 // Лимит на страницу приглашения — чтобы токены нельзя было перебирать.
 Route::livewire('/invite/{token}', AcceptInvite::class)->middleware(['guest', 'throttle:10,1'])->name('invite.accept');
 
