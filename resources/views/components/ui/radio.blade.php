@@ -6,18 +6,21 @@
 ])
 
 @php
-    $id = $id ?? ($name && $value !== null ? $name.'-'.\Illuminate\Support\Str::slug((string) $value) : $name);
+    $id ??= $name && $value !== null ? $name.'-'.\Illuminate\Support\Str::slug((string) $value) : $name;
 @endphp
 
-<label for="{{ $id }}" class="flex min-h-11 items-center gap-2 text-body text-ink">
+{{-- Подпись — label или слот (слот нужен, когда в подписи разметка). --}}
+<label @if ($id) for="{{ $id }}" @endif class="flex min-h-11 items-center gap-2 text-body text-ink has-[:disabled]:cursor-not-allowed has-[:disabled]:text-ink-muted">
     <input
         type="radio"
-        id="{{ $id }}"
+        @if ($id) id="{{ $id }}" @endif
         @if ($name) name="{{ $name }}" @endif
         @if ($value !== null) value="{{ $value }}" @endif
-        {{ $attributes->merge(['class' => 'h-4 w-4 shrink-0 border-line accent-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50']) }}
+        {{ $attributes->merge(['class' => 'focus-ring h-4 w-4 shrink-0 accent-accent disabled:cursor-not-allowed']) }}
     >
-    @if ($label)
-        <span>{{ $label }}</span>
+    @if ($slot->isNotEmpty())
+        <span class="min-w-0 break-words">{{ $slot }}</span>
+    @elseif ($label)
+        <span class="min-w-0 break-words">{{ $label }}</span>
     @endif
 </label>

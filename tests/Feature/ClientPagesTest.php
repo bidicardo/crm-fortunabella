@@ -100,8 +100,9 @@ it('escapes the name on the card', function () {
 it('titles the card "Клиент" in the top bar and shows the name only in the heading', function () {
     $client = Client::factory()->create(['name' => 'Иван Олегович']);
 
-    $this->get(route('clients.show', $client))
-        ->assertSee('<span class="truncate text-lg font-semibold">Клиент</span>', false)
+    $response = $this->get(route('clients.show', $client))
         ->assertSee('<title>Клиент — '.config('app.name').'</title>', false)
         ->assertSee('Иван Олегович');
+
+    expect($response->getContent())->toMatch('~<span id="page-title"[^>]*>Клиент</span>~u');
 });

@@ -1,103 +1,126 @@
+@php
+    $th = 'px-4 py-2 text-caption font-semibold';
+    $td = 'px-4 py-2';
+@endphp
+
 <div class="max-w-3xl space-y-6">
     <section class="space-y-3">
-        <h2 class="text-lg font-semibold">Сотрудники</h2>
+        <h2 class="text-h3 font-semibold">Сотрудники</h2>
 
-        @error('users') <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
+        @error('users') <x-ui.alert kind="error">{{ $message }}</x-ui.alert> @enderror
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="border-b border-slate-200 dark:border-slate-700">
-                        <th class="py-2 pr-4">Имя</th>
-                        <th class="py-2 pr-4">Email</th>
-                        <th class="py-2 pr-4">Роль</th>
-                        <th class="py-2 pr-4">Статус</th>
-                        <th class="py-2"></th>
+        <x-ui.table>
+            <thead class="bg-surface">
+                <tr>
+                    <th class="{{ $th }}">Имя</th>
+                    <th class="{{ $th }}">Email</th>
+                    <th class="{{ $th }}">Роль</th>
+                    <th class="{{ $th }}">Статус</th>
+                    <th class="{{ $th }}"><span class="sr-only">Действия</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($users as $user)
+                    <tr wire:key="user-{{ $user->id }}" class="border-t border-line">
+                        <td class="{{ $td }}">{{ $user->name }}</td>
+                        <td class="{{ $td }}">{{ $user->email }}</td>
+                        <td class="{{ $td }}">{{ $user->isCreator() ? 'Создатель' : 'Участник' }}</td>
+                        <td class="{{ $td }}">
+                            <x-ui.badge :tone="$user->isBlocked() ? 'error' : 'success'">{{ $user->isBlocked() ? 'Заблокирован' : 'Активен' }}</x-ui.badge>
+                        </td>
+                        <td class="{{ $td }} text-right">
+                            @unless ($user->isCreator())
+                                @if ($user->isBlocked())
+                                    <x-ui.button variant="secondary" wire:click="unblock({{ $user->id }})"
+                                        wire:confirm="Разблокировать {{ $user->name }}?">Разблокировать</x-ui.button>
+                                @else
+                                    <x-ui.button variant="danger" wire:click="block({{ $user->id }})"
+                                        wire:confirm="Заблокировать {{ $user->name }}? Все его сессии будут завершены.">Заблокировать</x-ui.button>
+                                @endif
+                            @endunless
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr wire:key="user-{{ $user->id }}" class="border-b border-slate-100 dark:border-slate-800">
-                            <td class="py-2 pr-4">{{ $user->name }}</td>
-                            <td class="py-2 pr-4">{{ $user->email }}</td>
-                            <td class="py-2 pr-4">{{ $user->isCreator() ? 'Создатель' : 'Участник' }}</td>
-                            <td class="py-2 pr-4">{{ $user->isBlocked() ? 'Заблокирован' : 'Активен' }}</td>
-                            <td class="py-2 text-right">
-                                @unless ($user->isCreator())
-                                    @if ($user->isBlocked())
-                                        <button wire:click="unblock({{ $user->id }})"
-                                            wire:confirm="Разблокировать {{ $user->name }}?"
-                                            class="rounded-md border border-slate-300 px-3 py-1 dark:border-slate-600">Разблокировать</button>
-                                    @else
-                                        <button wire:click="block({{ $user->id }})"
-                                            wire:confirm="Заблокировать {{ $user->name }}? Все его сессии будут завершены."
-                                            class="rounded-md border border-red-300 px-3 py-1 text-red-600 dark:text-red-400">Заблокировать</button>
-                                    @endif
-                                @endunless
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </x-ui.table>
     </section>
 
     <section class="space-y-3">
-        <h2 class="text-lg font-semibold">Приглашения</h2>
+        <h2 class="text-h3 font-semibold">Приглашения</h2>
 
-        <button wire:click="createInvite" class="rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500">
-            Создать приглашение
-        </button>
+        <x-ui.button wire:click="createInvite">Создать приглашение</x-ui.button>
 
         @if ($inviteUrl)
-            <div x-data="{ copied: false }" class="space-y-2 rounded-md border border-amber-400 bg-amber-50 p-3 dark:bg-slate-800">
-                <p class="text-sm">Ссылка действует 24 часа и показывается только сейчас. Скопируйте её и передайте сотруднику.</p>
-                <div class="flex gap-2">
-                    <input x-ref="url" type="text" readonly value="{{ $inviteUrl }}"
-                        class="w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm dark:border-slate-600"
-                        x-on:focus="$el.select()">
-                    <button type="button" class="rounded-md border border-slate-300 px-3 py-2 text-sm dark:border-slate-600"
-                        x-on:click="
-                            // На http (не HTTPS) navigator.clipboard недоступен — копируем через выделение.
-                            if (navigator.clipboard) { navigator.clipboard.writeText($refs.url.value); }
-                            else { $refs.url.select(); document.execCommand('copy'); }
-                            copied = true;
-                        ">
-                        <span x-text="copied ? 'Скопировано' : 'Копировать'"></span>
-                    </button>
+            <x-ui.alert kind="warning">
+                {{-- navigator.clipboard есть только на HTTPS (и localhost); иначе копируем через выделение.
+                     iOS выделяет текст только в поле без readonly и только через setSelectionRange.
+                     Код — в методе, а не в x-on:click: выражение Alpine, начинающееся с комментария //,
+                     не распознаётся как оператор и падает с синтаксической ошибкой. --}}
+                <div
+                    x-data="{
+                        copied: false,
+                        copy() {
+                            const el = this.$refs.url;
+                            const bySelection = () => {
+                                el.readOnly = false;
+                                el.focus();
+                                el.setSelectionRange(0, el.value.length);
+                                this.copied = document.execCommand('copy');
+                                el.readOnly = true;
+                                el.blur();
+                            };
+                            if (navigator.clipboard && window.isSecureContext) {
+                                navigator.clipboard.writeText(el.value).then(() => this.copied = true, bySelection);
+                            } else {
+                                bySelection();
+                            }
+                        },
+                    }"
+                    class="space-y-2"
+                >
+                    <p>Ссылка действует 24 часа и показывается только сейчас. Скопируйте её и передайте сотруднику.</p>
+                    <div class="flex gap-2">
+                        <div class="min-w-0 flex-1">
+                            <x-ui.input x-ref="url" type="text" readonly value="{{ $inviteUrl }}" aria-label="Ссылка-приглашение"
+                                x-on:focus="$el.select()" />
+                        </div>
+                        <x-ui.button variant="secondary" icon="copy" class="shrink-0" x-on:click="copy()">
+                            <span x-text="copied ? 'Скопировано' : 'Копировать'"></span>
+                        </x-ui.button>
+                    </div>
                 </div>
-            </div>
+            </x-ui.alert>
         @endif
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="border-b border-slate-200 dark:border-slate-700">
-                        <th class="py-2 pr-4">Создано</th>
-                        <th class="py-2 pr-4">Кто создал</th>
-                        <th class="py-2">Статус</th>
+        <x-ui.table>
+            <thead class="bg-surface">
+                <tr>
+                    <th class="{{ $th }}">Создано</th>
+                    <th class="{{ $th }}">Кто создал</th>
+                    <th class="{{ $th }}">Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($invites as $invite)
+                    <tr class="border-t border-line">
+                        <td class="{{ $td }}">{{ $invite->created_at->format('d.m.Y H:i') }}</td>
+                        <td class="{{ $td }}">{{ $invite->creator->name }}</td>
+                        <td class="{{ $td }}">
+                            @if ($invite->used_at)
+                                <x-ui.badge>использовано</x-ui.badge>
+                            @elseif ($invite->expires_at->isPast())
+                                <x-ui.badge tone="warning">истекло</x-ui.badge>
+                            @else
+                                <x-ui.badge tone="success">активно</x-ui.badge>
+                            @endif
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @forelse ($invites as $invite)
-                        <tr class="border-b border-slate-100 dark:border-slate-800">
-                            <td class="py-2 pr-4">{{ $invite->created_at->format('d.m.Y H:i') }}</td>
-                            <td class="py-2 pr-4">{{ $invite->creator->name }}</td>
-                            <td class="py-2">
-                                @if ($invite->used_at)
-                                    использовано
-                                @elseif ($invite->expires_at->isPast())
-                                    истекло
-                                @else
-                                    активно
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="3" class="py-3 text-slate-500">Приглашений пока нет.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                @empty
+                    <tr class="border-t border-line">
+                        <td colspan="3" class="{{ $td }} text-ink-secondary">Приглашений пока нет.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </x-ui.table>
     </section>
 </div>

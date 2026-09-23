@@ -5,10 +5,10 @@
 ])
 
 @php
-    $base = 'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50';
+    $base = 'focus-ring inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md transition hover:bg-line/50 disabled:cursor-not-allowed disabled:opacity-50';
     $variants = [
-        'secondary' => 'text-ink hover:bg-surface',
-        'danger' => 'text-error hover:bg-surface',
+        'secondary' => 'text-ink',
+        'danger' => 'text-error',
     ];
     $classes = $base.' '.($variants[$variant] ?? $variants['secondary']);
 @endphp

@@ -85,3 +85,11 @@ it('renders a dropdown panel container', function () {
     expect(Blade::render('<x-ui.panel>Пункт</x-ui.panel>'))
         ->toContain('Пункт')->toContain('shadow-panel');
 });
+
+it('renders a read-only card field with a dash when empty and escapes the value', function () {
+    expect(Blade::render('<dl><x-ui.field label="Телефон">{{ $v }}</x-ui.field></dl>', ['v' => null]))
+        ->toContain('<dt')->toContain('Телефон')->toContain('>—</dd>');
+
+    expect(Blade::render('<dl><x-ui.field label="Примечания" multiline>{{ $v }}</x-ui.field></dl>', ['v' => '<b>x</b>']))
+        ->toContain('&lt;b&gt;x&lt;/b&gt;')->toContain('whitespace-pre-line');
+});

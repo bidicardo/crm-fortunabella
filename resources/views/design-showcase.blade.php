@@ -7,7 +7,7 @@
         <div class="mx-auto max-w-5xl space-y-10 p-4 pb-16 sm:p-8">
             <header class="flex flex-wrap items-center justify-between gap-3">
                 <h1 class="text-h2 font-bold">Витрина дизайн-системы</h1>
-                <x-theme-toggle class="rounded-md border border-line px-3 py-1.5 text-body" />
+                <x-theme-toggle class="focus-ring min-h-11 rounded-md border border-line px-3 text-body hover:bg-line/50" />
             </header>
 
             <p class="max-w-2xl text-body text-ink-secondary">
@@ -106,6 +106,17 @@
                     <x-ui.radio name="demo-radio" value="b" label="Вариант Б" />
                     <x-ui.switch label="Тёмная тема (пример переключателя)" />
                 </div>
+            </section>
+
+            {{-- Поле карточки (только чтение) --}}
+            <section class="max-w-2xl space-y-2">
+                <h2 class="text-h3 font-semibold">Поля карточки</h2>
+                <dl class="grid gap-4 sm:grid-cols-2">
+                    <x-ui.field label="Тип клиента">Физическое лицо</x-ui.field>
+                    <x-ui.field label="Роль"></x-ui.field>
+                    <x-ui.field label="Примечания" class="sm:col-span-2" multiline>Первая строка
+Вторая строка</x-ui.field>
+                </dl>
             </section>
 
             {{-- Метки-статусы --}}

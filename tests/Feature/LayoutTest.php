@@ -27,9 +27,10 @@ it('marks the active item with aria-current', function () {
 });
 
 it('shows the section title in the top bar and in the page title', function () {
-    $this->actingAs(User::factory()->creator()->create())->get('/users')
-        ->assertSee('<span class="truncate text-lg font-semibold">Пользователи</span>', false)
+    $response = $this->actingAs(User::factory()->creator()->create())->get('/users')
         ->assertSee('<title>Пользователи — '.config('app.name').'</title>', false);
+
+    expect($response->getContent())->toMatch('~<span id="page-title"[^>]*>Пользователи</span>~u');
 });
 
 it('shows Users in the user menu only to the creator', function () {

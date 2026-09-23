@@ -5,7 +5,7 @@
 
 # Зависимости
 node_modules/
-vendor/
+/vendor/
 
 # Python
 __pycache__/

@@ -3,20 +3,20 @@
     $items = collect(\App\Support\Navigation::groups())->pluck('items')->flatten(1);
     $tabs = $items->where('tab', true);
     $more = $items->where('tab', false);
-    $tab = 'flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs';
+    $tab = 'focus-ring flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-caption';
 @endphp
 
 {{-- Нижняя панель: только уже 768 px. Переключение с левым меню — чистый CSS. --}}
 <div x-data="{ open: false }" x-on:keydown.escape.window="open = false" class="md:hidden">
     <nav
         aria-label="Нижнее меню"
-        class="fixed inset-x-0 bottom-0 z-30 flex border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-slate-700 dark:bg-slate-900"
+        class="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-bar pb-[env(safe-area-inset-bottom)]"
     >
         @foreach ($tabs as $item)
             <a
                 href="{{ $item['url'] }}"
                 @if ($item['current']) aria-current="page" @endif
-                class="{{ $tab }} {{ $item['current'] ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400' }}"
+                class="{{ $tab }} {{ $item['current'] ? 'font-semibold text-accent' : 'text-ink-secondary' }}"
             >
                 <x-icon :name="$item['icon']" class="h-6 w-6" />
                 <span>{{ $item['label'] }}</span>
@@ -29,9 +29,9 @@
                 aria-haspopup="dialog"
                 x-bind:aria-expanded="open"
                 x-on:click="open = true"
-                class="{{ $tab }} {{ $more->contains('current', true) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400' }}"
+                class="{{ $tab }} {{ $more->contains('current', true) ? 'font-semibold text-accent' : 'text-ink-secondary' }}"
             >
-                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3" /></svg>
+                <x-icon name="more" class="h-6 w-6" />
                 <span>Ещё</span>
             </button>
         @endif
@@ -44,20 +44,18 @@
             <div
                 role="dialog"
                 aria-label="Ещё"
-                class="absolute inset-x-0 bottom-0 rounded-t-2xl bg-white pb-[env(safe-area-inset-bottom)] dark:bg-slate-800"
+                class="absolute inset-x-0 bottom-0 rounded-t-2xl bg-surface pb-[env(safe-area-inset-bottom)] shadow-panel"
             >
                 <div class="flex items-center justify-between px-4 py-3">
-                    <span class="font-semibold">Ещё</span>
-                    <button type="button" aria-label="Закрыть" class="flex h-11 w-11 items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" x-on:click="open = false">
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
-                    </button>
+                    <span class="text-h4 font-semibold">Ещё</span>
+                    <x-ui.icon-button icon="close" label="Закрыть" x-on:click="open = false" />
                 </div>
 
                 @foreach ($more as $item)
                     <a
                         href="{{ $item['url'] }}"
                         @if ($item['current']) aria-current="page" @endif
-                        class="flex min-h-14 items-center gap-4 px-4 text-base hover:bg-slate-100 dark:hover:bg-slate-700 {{ $item['current'] ? 'font-semibold text-indigo-600 dark:text-indigo-400' : '' }}"
+                        class="focus-ring flex min-h-14 items-center gap-4 px-4 text-body-md hover:bg-line/50 {{ $item['current'] ? 'font-semibold text-accent' : '' }}"
                     >
                         <x-icon :name="$item['icon']" class="h-6 w-6" />
                         <span>{{ $item['label'] }}</span>

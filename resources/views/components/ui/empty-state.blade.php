@@ -4,7 +4,8 @@
     'text' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'flex flex-col items-center gap-2 rounded-lg border border-dashed border-line px-6 py-10 text-center']) }}>
+{{-- Без рамки: живёт и отдельным блоком, и внутри ячейки таблицы. --}}
+<div {{ $attributes->merge(['class' => 'flex flex-col items-center gap-2 px-6 py-8 text-center']) }}>
     @if ($icon)
         <x-icon :name="$icon" class="h-8 w-8 text-ink-secondary" />
     @endif
