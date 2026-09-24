@@ -4,16 +4,13 @@ namespace App\Livewire;
 
 use App\Enums\ClientLegalType;
 use App\Models\Client;
-use App\Rules\RussianPhone;
 use App\Services\DuplicateFinder;
 use App\Services\PhoneNormalizer;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 
+/** Создание клиента. Правка — по одному полю прямо в карточке (ClientShow). */
 class ClientForm extends Component
 {
-    public ?Client $client = null;
-
     public string $name = '';
 
     public string $phone = '';
@@ -30,21 +27,7 @@ class ClientForm extends Component
 
     public string $notes = '';
 
-    public function mount(?Client $client = null): void
-    {
-        if (! $client?->exists) {
-            return;
-        }
-
-        // Архивные карточки только для чтения: страница редактирования отдаёт 403.
-        abort_if($client->isArchived(), 403);
-
-        $this->client = $client;
-        $this->fill(array_map(fn ($v) => $v ?? '', $client->only(['name', 'phone', 'email', 'social', 'role', 'contact_time', 'notes'])));
-        $this->legal_type = $client->legal_type?->value ?? '';
-    }
-
-    /** Найденные при создании возможные дубли: id клиента => совпавшие поля. */
+    /** Найденные возможные дубли: id клиента => совпавшие поля. */
     public array $duplicates = [];
 
     /** Телефон и email, для которых показано предупреждение: «Продолжить» действует только для них. */
@@ -57,21 +40,10 @@ class ClientForm extends Component
 
     public function save(bool $ignoreDuplicates = false)
     {
-        abort_if($this->client?->isArchived(), 403);
+        $data = $this->validate(Client::validationRules());
 
-        $data = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', new RussianPhone],
-            'email' => ['nullable', 'email', 'max:255'],
-            'social' => ['nullable', 'string', 'max:255'],
-            'legal_type' => ['nullable', Rule::enum(ClientLegalType::class)],
-            'role' => ['nullable', 'string', 'max:255'],
-            'contact_time' => ['nullable', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]);
-
-        // Предупреждение о дубле — только при создании; создание дубля не запрещено.
-        if (! $this->client && ! ($ignoreDuplicates && $this->warnedFor === $this->duplicatesKey())) {
+        // Создание дубля не запрещено — только предупреждение.
+        if (! ($ignoreDuplicates && $this->warnedFor === $this->duplicatesKey())) {
             $found = (new DuplicateFinder)->find($data['phone'], $data['email']);
 
             if ($found->isNotEmpty()) {
@@ -86,12 +58,9 @@ class ClientForm extends Component
         }
 
         // Пустые строки из формы храним как null.
-        $data = array_map(fn ($value) => $value === '' ? null : $value, $data);
+        $client = Client::create(array_map(fn ($value) => $value === '' ? null : $value, $data));
 
-        $client = $this->client ?? new Client;
-        $client->fill($data)->save();
-
-        session()->flash('status', $this->client ? 'Изменения сохранены.' : 'Клиент создан.');
+        session()->flash('status', 'Клиент создан.');
 
         return $this->redirectRoute('clients.show', $client, navigate: false);
     }
@@ -101,6 +70,6 @@ class ClientForm extends Component
         return view('livewire.client-form', [
             'legalTypes' => ClientLegalType::cases(),
             'duplicateClients' => $this->duplicates ? Client::whereKey(array_keys($this->duplicates))->get() : collect(),
-        ])->title($this->client ? 'Редактирование клиента' : 'Новый клиент');
+        ])->title('Новый клиент');
     }
 }

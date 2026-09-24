@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ClientLegalType;
 use App\Models\Concerns\LogsActivity;
+use App\Rules\RussianPhone;
 use App\Services\PhoneNormalizer;
 use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Validation\Rule;
 
 // archived_at и merged_* намеренно не в fillable: их выставляет только слияние (ClientMergeService).
 #[Fillable(['name', 'phone', 'email', 'social', 'legal_type', 'role', 'contact_time', 'notes'])]
@@ -34,6 +36,21 @@ class Client extends Model
     protected function phone(): Attribute
     {
         return Attribute::set(fn (?string $value) => (new PhoneNormalizer)->normalize($value));
+    }
+
+    /** Правила проверки полей: общие для формы создания и правки поля в карточке. */
+    public static function validationRules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', new RussianPhone],
+            'email' => ['nullable', 'email', 'max:255'],
+            'social' => ['nullable', 'string', 'max:255'],
+            'legal_type' => ['nullable', Rule::enum(ClientLegalType::class)],
+            'role' => ['nullable', 'string', 'max:255'],
+            'contact_time' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
+        ];
     }
 
     public function scopeActive(Builder $query): void

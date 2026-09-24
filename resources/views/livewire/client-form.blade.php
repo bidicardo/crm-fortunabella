@@ -1,4 +1,6 @@
-<form wire:submit="save" class="max-w-xl space-y-4" x-data x-on:duplicates-found.window="$nextTick(() => window.scrollTo({ top: 0, behavior: 'smooth' }))">
+{{-- Создание клиента. Та же компоновка, что у карточки (client-show, задача 19а): слева данные
+     и отдельный блок примечаний, поля в том же порядке и по два в строке. Правка — в карточке. --}}
+<form wire:submit="save" class="min-w-0 max-w-6xl space-y-4" x-data x-on:duplicates-found.window="$nextTick(() => window.scrollTo({ top: 0, behavior: 'smooth' }))">
     @if ($duplicateClients->isNotEmpty())
         <x-ui.alert kind="warning" title="Возможно, такой клиент уже есть">
             <div class="space-y-3">
@@ -20,29 +22,32 @@
         </x-ui.alert>
     @endif
 
-    <x-ui.input id="name" label="Имя *" type="text" wire:model="name" required />
-    <x-ui.input id="phone" label="Телефон" type="tel" wire:model="phone" placeholder="+7 917 123-45-67" />
-    <x-ui.input id="email" label="Email" type="email" wire:model="email" />
-    <x-ui.input id="social" label="Соцсеть или мессенджер" type="text" wire:model="social" />
+    <div class="grid gap-4 lg:grid-cols-3 lg:items-start">
+        <div class="min-w-0 space-y-4 lg:col-span-2">
+            <x-ui.card>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <x-ui.input id="name" label="Имя *" type="text" wire:model="name" required />
+                    </div>
+                    <x-ui.input id="phone" label="Телефон" type="tel" wire:model="phone" placeholder="+7 917 123-45-67" />
+                    <x-ui.input id="email" label="Email" type="email" wire:model="email" />
+                    <x-ui.input id="social" label="Соцсеть или мессенджер" type="text" wire:model="social" />
+                    <x-ui.select id="legal_type" label="Тип клиента" wire:model="legal_type">
+                        <option value="">—</option>
+                        @foreach ($legalTypes as $type)
+                            <option value="{{ $type->value }}">{{ $type->label() }}</option>
+                        @endforeach
+                    </x-ui.select>
+                    <x-ui.input id="role" label="Роль" type="text" wire:model="role" placeholder="Например: невеста, организатор" />
+                    <x-ui.input id="contact_time" label="Удобное время для связи" type="text" wire:model="contact_time" />
+                </div>
+            </x-ui.card>
 
-    <div class="grid gap-4 sm:grid-cols-2">
-        <x-ui.select id="legal_type" label="Тип клиента" wire:model="legal_type">
-            <option value="">—</option>
-            @foreach ($legalTypes as $type)
-                <option value="{{ $type->value }}">{{ $type->label() }}</option>
-            @endforeach
-        </x-ui.select>
-
-        <x-ui.input id="role" label="Роль" type="text" wire:model="role" placeholder="Например: невеста, организатор" />
+            <x-ui.card>
+                <x-ui.textarea id="notes" label="Примечания" rows="4" wire:model="notes" />
+            </x-ui.card>
+        </div>
     </div>
 
-    <x-ui.input id="contact_time" label="Удобное время для связи" type="text" wire:model="contact_time" />
-    <x-ui.textarea id="notes" label="Примечания" rows="4" wire:model="notes" />
-
-    <div class="flex items-center gap-3">
-        <x-ui.button type="submit">Сохранить</x-ui.button>
-        @if ($client)
-            <x-ui.button variant="text" :href="route('clients.show', $client)">Отмена</x-ui.button>
-        @endif
-    </div>
+    <x-ui.button type="submit">Сохранить</x-ui.button>
 </form>

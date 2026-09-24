@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\ClientForm;
+use App\Livewire\ClientShow;
 use App\Models\Client;
 use App\Models\User;
 use App\Services\DuplicateFinder;
@@ -108,10 +109,16 @@ describe('client form', function () {
         $client = Client::factory()->create(['phone' => '+79171234567']);
         Client::factory()->create(['phone' => '+79171234567']);
 
-        Livewire::test(ClientForm::class, ['client' => $client])
-            ->set('name', 'Изменённое')
+        // Правка — прямо в карточке; совпадающий телефон сохраняется без предупреждения.
+        Livewire::test(ClientShow::class, ['client' => $client])
+            ->call('edit', 'phone')
+            ->set('value', '8 917 123-45-67')
             ->call('save')
-            ->assertRedirect(route('clients.show', $client));
+            ->assertHasNoErrors()
+            ->assertSet('editing', null)
+            ->call('edit', 'name')
+            ->set('value', 'Изменённое')
+            ->call('save');
 
         expect($client->fresh()->name)->toBe('Изменённое');
     });

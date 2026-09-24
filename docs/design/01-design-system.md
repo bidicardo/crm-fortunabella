@@ -260,7 +260,9 @@ inline SVG в `x-icon`.
 ### Блок-карточка с заголовком
 
 Фон `bg-surface`, радиус `--radius-lg`, отступ 16–24px, граница `border`
-(1px), заголовок `--text-h3`.
+(1px), заголовок необязателен — `--text-h4` (после 19а: по референсу 6
+заголовки блоков карточки мелкие, а у блоков, понятных по содержанию,
+заголовка нет).
 
 ### Таблица
 
@@ -330,6 +332,7 @@ item `#DED3C5` с рамкой line `#CBB9A4`, hover `#D4C6B4`, current `#904D30
 | `table.blade.php` | `<x-ui.table>` обёртка прокрутки + классы шапки/строк |
 | `empty-state.blade.php` | `<x-ui.empty-state icon title text>` |
 | `field.blade.php` | `<x-ui.field label multiline>` — поле карточки только для чтения, внутри `<dl>` |
+| `editable-field.blade.php` | `<x-ui.editable-field label field type :editing :readonly>` — поле карточки с правкой по щелчку: в просмотре выглядит как `x-ui.field` со значком карандаша, в правке — поле ввода (text/tel/email/textarea/select) с кнопками ✓/✕; работает с методами `edit`/`save`/`cancel` и черновиком `$value` Livewire-компонента карточки |
 | `panel.blade.php` | визуальный контейнер выпадающей панели (Alpine-логика остаётся в месте использования) |
 
 ### Изменяемые файлы

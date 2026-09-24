@@ -31,7 +31,6 @@ Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/clients', ClientTable::class)->name('clients.index');
     Route::livewire('/clients/create', ClientForm::class)->name('clients.create');
     Route::livewire('/clients/{client}', ClientShow::class)->name('clients.show');
-    Route::livewire('/clients/{client}/edit', ClientForm::class)->name('clients.edit');
     Route::livewire('/clients/{client}/merge', ClientMerge::class)->name('clients.merge');
     Route::livewire('/users', Users::class)->middleware('can:manage-users')->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');
