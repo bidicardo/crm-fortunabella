@@ -1,17 +1,17 @@
 {{-- Левое меню: только от 768 px. Свёрнутое состояние — класс sidebar-collapsed на <html>.
-     Цвета sidebar-*: тёмно-коричневое в светлой теме, тёмное в тёмной; рамка фокуса внутри — своим цветом.
+     Цвета sidebar-*: светло-бежевое в светлой теме (как фигуры страницы входа), тёмное в тёмной; рамка фокуса внутри — своим цветом.
      Закреплено на высоту окна (sticky): иначе на длинной странице «Свернуть» уходит за нижний край.
      Пункты и «Свернуть» — кнопки на подложке; блоки разделены светлыми линиями. --}}
 @php
-    $button = 'focus-ring flex min-h-11 w-full items-center gap-3 rounded-md px-3 collapsed:justify-center collapsed:px-0';
-    $idle = 'bg-sidebar-item hover:bg-sidebar-hover hover:text-white';
+    $button = 'focus-ring flex min-h-11 w-full items-center gap-3 rounded-md border px-3 collapsed:justify-center collapsed:px-0';
+    $idle = 'border-sidebar-line bg-sidebar-item hover:bg-sidebar-hover hover:text-sidebar-strong';
 @endphp
 
 <aside
     x-data
-    class="hidden shrink-0 flex-col bg-sidebar text-body text-sidebar-ink [--color-accent:var(--color-sidebar-active)] md:sticky md:top-0 md:flex md:h-dvh md:w-64 md:self-start md:collapsed:w-16 dark:border-r dark:border-line"
+    class="hidden shrink-0 flex-col bg-sidebar text-body text-sidebar-ink [--color-accent:var(--color-sidebar-active)] md:sticky md:top-0 md:flex md:h-dvh md:w-64 md:self-start md:collapsed:w-16 border-r border-sidebar-line"
 >
-    <div class="flex h-14 shrink-0 items-center border-b border-sidebar-line px-5 text-h4 font-semibold text-white collapsed:justify-center collapsed:px-0">
+    <div class="flex h-14 shrink-0 items-center border-b border-sidebar-line px-5 text-h4 font-semibold text-sidebar-strong collapsed:justify-center collapsed:px-0">
         <span class="collapsed:hidden">{{ config('app.name') }}</span>
         <span class="hidden collapsed:inline" aria-hidden="true">F</span>
     </div>
@@ -28,7 +28,7 @@
                         href="{{ $item['url'] }}"
                         title="{{ $item['label'] }}"
                         @if ($item['current']) aria-current="page" @endif
-                        class="{{ $button }} {{ $item['current'] ? 'bg-sidebar-current font-semibold text-white' : $idle }}"
+                        class="{{ $button }} {{ $item['current'] ? 'border-sidebar-current bg-sidebar-current font-semibold text-white' : $idle }}"
                     >
                         <x-icon :name="$item['icon']" />
                         <span class="truncate collapsed:hidden">{{ $item['label'] }}</span>

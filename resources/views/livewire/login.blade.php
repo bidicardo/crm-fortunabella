@@ -1,5 +1,5 @@
-<div class="mx-auto max-w-sm space-y-4">
-    <h1 class="text-h3 font-bold">Вход</h1>
+<div class="space-y-4">
+    <h1 class="text-center text-h3 font-bold">Вход</h1>
 
     @if (session('blocked'))
         <x-ui.alert kind="error">{{ session('blocked') }}</x-ui.alert>
@@ -13,6 +13,11 @@
 
         <x-ui.checkbox id="remember" label="Запомнить меня" wire:model="remember" />
 
-        <x-ui.button type="submit" class="w-full">Войти</x-ui.button>
+        {{-- Во время отправки кнопка неактивна и крутит значок --}}
+        <x-ui.button type="submit" class="w-full" wire:loading.attr="disabled" wire:target="login">
+            <x-icon name="login" class="h-4 w-4" wire:loading.remove wire:target="login" />
+            <x-icon name="loading" class="h-4 w-4 animate-spin" wire:loading wire:target="login" />
+            Войти
+        </x-ui.button>
     </form>
 </div>

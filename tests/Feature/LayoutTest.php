@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Invite;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,17 @@ it('has a logout form', function () {
 it('does not show the sidebar on login and invite pages', function () {
     $this->get('/login')->assertOk()->assertDontSee('Основное меню')->assertSee('Тёмная тема', false);
     $this->get('/invite/bad-token')->assertNotFound()->assertDontSee('Основное меню');
+});
+
+it('shows the logo with an accessible name on guest pages', function () {
+    [, $token] = Invite::issue(User::factory()->creator()->create());
+
+    foreach (['/login', "/invite/{$token}", '/invite/bad-token'] as $url) {
+        $this->get($url)
+            ->assertSee('role="img"', false)
+            ->assertSee('aria-label="Логотип '.config('app.name').'"', false)
+            ->assertSee('images/logo.png', false);
+    }
 });
 
 function addRoutes(string ...$names): void

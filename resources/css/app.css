@@ -64,19 +64,25 @@ select {
     --color-stage-done: #a34e0a;
     --color-stage-refused: #c62828;
 
-    /* Левое меню в светлой теме — тёмно-коричневое (решение владельца): пункты — кнопки
-       на подложке item, активный пункт залит цветом основной кнопки, разделители — line */
-    --color-sidebar: #533727;
-    --color-sidebar-item: #614738;
-    --color-sidebar-hover: #6d5547;
+    /* Левое меню в светлой теме — светло-бежевое, цвет фигур на странице входа
+       (#CBB9A4 40% поверх #FAF9F6; решение владельца): пункты — кнопки на подложке item
+       с рамкой line, активный пункт залит цветом основной кнопки; strong — заголовок и
+       текст при наведении, active — рамка фокуса */
+    --color-sidebar: #e7dfd5;
+    --color-sidebar-item: #ded3c5;
+    --color-sidebar-hover: #d4c6b4;
     --color-sidebar-current: #904d30;
-    --color-sidebar-line: #796357;
-    --color-sidebar-ink: #f4e6dc;
-    --color-sidebar-label: #e6dac8;
-    --color-sidebar-active: #faf9f6;
+    --color-sidebar-line: #cbb9a4;
+    --color-sidebar-ink: #3a2e26;
+    --color-sidebar-strong: #3a2e26;
+    --color-sidebar-label: #6b5d52;
+    --color-sidebar-active: #904d30;
 
     /* Верхняя и нижняя панели — чуть темнее фона страницы */
     --color-bar: #f4f1ea;
+
+    /* Логотип (трафарет public/images/logo.png, окрашивается этим цветом) */
+    --color-logo: #533727;
 
     /* Скругления (радиус); шаг отступов — стандартная шкала Tailwind */
     --radius-sm: 0.375rem;
@@ -145,10 +151,13 @@ select {
     --color-sidebar-current: #162ba9;
     --color-sidebar-line: #4a5568;
     --color-sidebar-ink: #a0aec0;
+    --color-sidebar-strong: #ffffff;
     --color-sidebar-label: #718096;
     --color-sidebar-active: #5d88f4;
 
     --color-bar: #0e0f10;
+
+    --color-logo: #f5f7fa;
 
     --shadow-panel: 0 4px 16px -4px rgb(0 0 0 / 0.4);
 

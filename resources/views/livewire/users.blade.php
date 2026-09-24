@@ -84,7 +84,7 @@
                             <x-ui.input x-ref="url" type="text" readonly value="{{ $inviteUrl }}" aria-label="Ссылка-приглашение"
                                 x-on:focus="$el.select()" />
                         </div>
-                        <x-ui.button variant="secondary" icon="copy" class="shrink-0" x-on:click="copy()">
+                        <x-ui.button icon="copy" class="shrink-0" x-on:click="copy()">
                             <span x-text="copied ? 'Скопировано' : 'Копировать'"></span>
                         </x-ui.button>
                     </div>
