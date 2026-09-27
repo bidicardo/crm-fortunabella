@@ -52,7 +52,10 @@
 
 ## API
 
-- Где будет размещаться CRM?
+- Где будет размещаться CRM? — **решено (сентябрь 2026):** VPS Hostkey
+  vm.nano, Москва, Docker; CRM — `crm.fortunabella.ru`, лендинг
+  `fortunabella.ru` — на том же VPS; DNS и почта — в REG.RU; бэкапы — на
+  ПК владельца (`docs/23-hosting-constraints.md`).
 - Как будет отправляться запрос с fortunabella.ru? — POST, JSON или
   form-data, поля и правила валидации зафиксированы по примеру
   `docs/24-exaple-sendphp-from-site.md`, см. `docs/13-landing-api.md`.

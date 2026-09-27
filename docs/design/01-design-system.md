@@ -172,7 +172,7 @@ inline SVG в `x-icon`.
 | `grid` | `layout-grid` | канбан/переключатель вида |
 | `trending` | `trending-up` | дашборд, аналитика |
 | `copy` | `copy` | «Копировать» (ссылка-приглашение) |
-| `edit` | `square-pen` | «Редактировать» |
+| `edit` | `square-pen` | правка поля в карточке (значок у поля) |
 | `merge` | `git-merge` | «Объединить с…» |
 | `archive` | `archive` | метка «архив» |
 | `delete` | `trash-2` | удаление (документы, будущее) |
