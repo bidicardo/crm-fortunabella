@@ -5,16 +5,18 @@
     'readonly' => false,
     'type' => 'text',
     'placeholder' => null,
+    // Несколько карточек на странице (контактные лица) — свой префикс, чтобы id полей не повторялись.
+    'idPrefix' => 'edit-',
 ])
 
 {{-- Поле карточки с правкой по клику (задача 19а). Ставится внутрь <dl>. Livewire-компонент карточки
-     должен иметь методы edit(поле), save(), cancel() и черновик $value (образец — ClientShow).
+     должен иметь методы edit(поле), save(), cancel() и черновик $value — трейт App\Livewire\Concerns\EditsFieldsInline.
      type: text | tel | email | textarea | select (варианты select — в слоте options).
      Сохранение — Enter (в textarea — Ctrl/Cmd+Enter), кнопка ✓ или выбор варианта в списке;
      отмена — Esc или ✕. Содержимое слота — значение для просмотра, пустое показывается как «—». --}}
 @php
     $multiline = $type === 'textarea';
-    $id = 'edit-'.$field;
+    $id = $idPrefix.$field;
     $empty = ! $slot->hasActualContent();
     $error = isset($errors) ? ($errors->first('value') ?: null) : null;
 @endphp

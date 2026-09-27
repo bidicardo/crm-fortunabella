@@ -51,7 +51,9 @@ CRM для управления клиентами, сделками-мероп�
   задаётся `#[Title('...')]` — название раздела в верхней панели.
 - Общие сервисы: `PhoneNormalizer` (телефон), `DuplicateFinder` (поиск дублей),
   `ClientMergeService` (слияние; связи для переноса — `relations()`), трейт
-  `LogsActivity` (история изменений моделей).
+  `LogsActivity` (история изменений моделей). Для карточек Livewire — трейты
+  `EditsFieldsInline` (правка по полю) и `WithActivityHistory` (блок истории,
+  лента — `<x-activity-history>`) в `app/Livewire/Concerns`.
 - Вёрстка для iPhone (шрифт полей 16 px, `min-h-dvh`, безопасная зона, без
   горизонтальной прокрутки страницы) — `docs/16-pwa-and-mobile.md`.
 - Дизайн-система (Д1 выполнена): цвета, шрифт Inter, скругления, тени — токены в

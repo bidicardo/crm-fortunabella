@@ -18,6 +18,19 @@ select {
     padding-right: 2.25rem;
 }
 
+/* Поле даты: iOS Safari рисует его со своей минимальной шириной (вылезает из карточки и наезжает
+   на соседние кнопки) и без значения схлопывает по высоте. Сбрасываем системный вид, высота — как у
+   текстового поля, дата — по левому краю. */
+input[type='date'] {
+    appearance: none;
+    min-width: 0;
+    min-height: 2.625rem;
+}
+
+input[type='date']::-webkit-date-and-time-value {
+    text-align: left;
+}
+
 /* iOS Safari приближает страницу при фокусе на поле со шрифтом меньше 16px — на телефоне ставим 16px. */
 @media (max-width: 767px) {
     input:not([type='checkbox']):not([type='radio']),

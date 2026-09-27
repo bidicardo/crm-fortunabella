@@ -7,6 +7,8 @@ use App\Livewire\ClientForm;
 use App\Livewire\ClientMerge;
 use App\Livewire\ClientShow;
 use App\Livewire\ClientTable;
+use App\Livewire\CounterpartyForm;
+use App\Livewire\CounterpartyShow;
 use App\Livewire\Home;
 use App\Livewire\Login;
 use App\Livewire\Users;
@@ -32,6 +34,9 @@ Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/clients/create', ClientForm::class)->name('clients.create');
     Route::livewire('/clients/{client}', ClientShow::class)->name('clients.show');
     Route::livewire('/clients/{client}/merge', ClientMerge::class)->name('clients.merge');
+    // {counterparty} — только число: не перехватывает /counterparties/active и другие адреса раздела.
+    Route::livewire('/counterparties/create', CounterpartyForm::class)->name('counterparties.create');
+    Route::livewire('/counterparties/{counterparty}', CounterpartyShow::class)->whereNumber('counterparty')->name('counterparties.show');
     Route::livewire('/users', Users::class)->middleware('can:manage-users')->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');
 });

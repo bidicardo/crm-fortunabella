@@ -92,47 +92,7 @@
                 </dl>
             </x-ui.card>
 
-            <x-ui.card title="История изменений">
-                <div class="space-y-3">
-                    {{-- В развёрнутом виде блок прокручивается сам, а не вся страница --}}
-                    <div class="space-y-3 {{ $historyExpanded ? 'max-h-72 overflow-y-auto pr-2' : '' }}">
-                        @forelse ($logs as $log)
-                            <div wire:key="log-{{ $log->id }}">
-                                <p class="text-caption text-ink-secondary">{{ $log->created_at->format('d.m.Y H:i') }} · {{ $log->user?->name ?? 'Система' }}</p>
-
-                                @if ($log->event === 'created')
-                                    <p>Клиент создан</p>
-                                @elseif ($log->event === 'updated')
-                                    <ul class="space-y-0.5">
-                                        @foreach ($log->changes ?? [] as $field => $change)
-                                            <li class="break-words">
-                                                {{ $client->activityLabel($field) }}:
-                                                <span class="text-ink-secondary">{{ $client->activityValue($field, $change['old'] ?? null) ?? '—' }}</span>
-                                                →
-                                                <span class="whitespace-pre-line">{{ $client->activityValue($field, $change['new'] ?? null) ?? '—' }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                @elseif ($log->event === 'merged')
-                                    @if (isset($log->changes['merged_client']))
-                                        <p class="break-words">Влит клиент <a href="{{ route('clients.show', $log->changes['merged_client']['id']) }}" class="focus-ring link">{{ $log->changes['merged_client']['name'] }}</a></p>
-                                    @elseif (isset($log->changes['merged_into']))
-                                        <p class="break-words">Влит в клиента <a href="{{ route('clients.show', $log->changes['merged_into']['id']) }}" class="focus-ring link">{{ $log->changes['merged_into']['name'] }}</a></p>
-                                    @endif
-                                @endif
-                            </div>
-                        @empty
-                            <p class="text-ink-secondary">Записей пока нет.</p>
-                        @endforelse
-                    </div>
-
-                    @if ($hasMoreHistory)
-                        <x-ui.button variant="text" wire:click="showMoreHistory">Показать ещё</x-ui.button>
-                    @elseif ($historyExpanded)
-                        <x-ui.button variant="text" wire:click="collapseHistory">Свернуть</x-ui.button>
-                    @endif
-                </div>
-            </x-ui.card>
+            <x-activity-history :subject="$client" :logs="$logs" :has-more="$hasMoreHistory" :expanded="$historyExpanded" created-label="Клиент создан" />
         </div>
     </div>
 </div>
