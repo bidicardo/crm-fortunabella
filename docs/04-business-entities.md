@@ -49,8 +49,26 @@ Counterparty 1 ──── много ActivityLog
   системных действий). Поля: событие (`created`, `updated`, `merged` и
   т. д.), изменения в JSON (для `updated` — по каждому полю старое и новое
   значение), время. Подключается трейтом `LogsActivity` к любой модели
-  (сейчас `Client`; в Фазах 3–4 — контрагенты и сделки). Записи только
+  (`Client`, `Counterparty`; в Фазе 4 — сделки). Записи только
   добавляются, из интерфейса не редактируются и не удаляются.
+
+## Контрагент и контактные лица
+
+`Counterparty` — поля: `name` (обязательно), `type` (свободный текст),
+`phone` (российский, `+7XXXXXXXXXX`), `email`, `social`,
+`cooperation_terms` (текст), `cooperation_started_at` (дата), `website`,
+`telegram`, `address`; `stage` — этап воронки (`CounterpartyStage`:
+`first_contact`, `pushing`, `cooperating`, `refused`; по умолчанию
+«Первый контакт»); `position` — порядок карточки в колонке канбана.
+`stage` и `position` меняются только методом `moveTo()`; `position` в
+историю не пишется.
+
+`CounterpartyContact` — `counterparty_id`, `full_name` (обязательно),
+`position_title`, `phone` (российский), `email`, `social`, `contact_time`,
+`notes`. Удаляются только вместе с контрагентом (каскад в БД). Своей
+истории нет: добавление, правка и удаление контактного лица пишутся в
+историю контрагента событиями `contact_added`, `contact_updated` (поле:
+было → стало) и `contact_removed` с ФИО лица.
 
 ## Важное правило
 
