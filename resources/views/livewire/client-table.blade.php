@@ -23,6 +23,10 @@
         save() { try { localStorage.setItem('clients.columns', JSON.stringify(this.cols)); } catch (e) {} },
     }"
 >
+    @if (session('status'))
+        <x-ui.alert kind="success">{{ session('status') }}</x-ui.alert>
+    @endif
+
     <div class="flex flex-wrap items-center gap-3">
         <div class="w-full sm:w-72">
             <x-ui.input type="search" icon="search" wire:model.live.debounce.300ms="search" placeholder="Поиск: имя, телефон, email…" aria-label="Поиск" />

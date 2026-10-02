@@ -50,7 +50,8 @@ CRM для управления клиентами, сделками-мероп�
   когда существует именованный маршрут (`clients.index` и т. п.). У каждой страницы
   задаётся `#[Title('...')]` — название раздела в верхней панели.
 - Общие сервисы: `PhoneNormalizer` (телефон), `DuplicateFinder` (поиск дублей),
-  `ClientMergeService` (слияние; связи для переноса — `relations()`), трейт
+  `ClientMergeService` (слияние; связи для переноса — `relations()`),
+  `RecordDeleter` (удаление клиента/контрагента; счётчик сделок — `dealsCount()`), трейт
   `LogsActivity` (история изменений моделей). Для карточек Livewire — трейты
   `EditsFieldsInline` (правка по полю) и `WithActivityHistory` (блок истории,
   лента — `<x-activity-history>`) в `app/Livewire/Concerns`.

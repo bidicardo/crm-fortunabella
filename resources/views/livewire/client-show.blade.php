@@ -52,8 +52,14 @@
         @unless ($archived)
             <div class="flex flex-wrap gap-2">
                 <x-ui.button variant="secondary" icon="merge" :href="route('clients.merge', $client)">Объединить с…</x-ui.button>
+                <x-ui.button variant="danger" icon="delete" wire:click="destroy"
+                    wire:confirm="Удалить клиента «{{ $client->name }}»{{ $duplicatesCount ? ' и влитые в него дубли ('.$duplicatesCount.')' : '' }} вместе с историей изменений? Восстановить будет нельзя.">Удалить</x-ui.button>
             </div>
         @endunless
+
+        @error('delete')
+            <x-ui.alert kind="error">{{ $message }}</x-ui.alert>
+        @enderror
     </div>
 
     <div class="grid gap-4 lg:grid-cols-3 lg:items-start">

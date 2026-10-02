@@ -41,7 +41,13 @@
                     @endforeach
                 </x-ui.select>
             </div>
+            <x-ui.button variant="danger" icon="delete" wire:click="destroy"
+                wire:confirm="Удалить контрагента «{{ $counterparty->name }}»{{ $contacts->isNotEmpty() ? ' и его контактных лиц ('.$contacts->count().')' : '' }} вместе с историей изменений? Восстановить будет нельзя.">Удалить</x-ui.button>
         </div>
+
+        @error('delete')
+            <x-ui.alert kind="error">{{ $message }}</x-ui.alert>
+        @enderror
     </div>
 
     <div class="grid gap-4 lg:grid-cols-3 lg:items-start">

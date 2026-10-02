@@ -10,6 +10,10 @@
      App\Livewire\Concerns\WithActivityHistory (методы showMoreHistory, collapseHistory). --}}
 @php
     $contactLabels = (new App\Models\CounterpartyContact)->activityLabels();
+
+    // Клиенты из записей о слиянии, которые ещё существуют (одним запросом): на удалённого — имя без ссылки.
+    $mergedIds = $logs->where('event', 'merged')->map(fn ($log) => ($log->changes['merged_client'] ?? $log->changes['merged_into'] ?? [])['id'] ?? null)->filter();
+    $existingClients = $mergedIds->isEmpty() ? [] : App\Models\Client::whereKey($mergedIds)->pluck('id')->all();
 @endphp
 
 <x-ui.card title="История изменений">
@@ -39,10 +43,18 @@
                             @break
 
                         @case ('merged')
-                            @if (isset($log->changes['merged_client']))
-                                <p class="break-words">Влит клиент <a href="{{ route('clients.show', $log->changes['merged_client']['id']) }}" class="focus-ring link">{{ $log->changes['merged_client']['name'] }}</a></p>
-                            @elseif (isset($log->changes['merged_into']))
-                                <p class="break-words">Влит в клиента <a href="{{ route('clients.show', $log->changes['merged_into']['id']) }}" class="focus-ring link">{{ $log->changes['merged_into']['name'] }}</a></p>
+                            @php
+                                $other = $log->changes['merged_client'] ?? $log->changes['merged_into'] ?? null;
+                            @endphp
+                            @if ($other)
+                                <p class="break-words">
+                                    {{ isset($log->changes['merged_client']) ? 'Влит клиент' : 'Влит в клиента' }}
+                                    @if (in_array($other['id'], $existingClients))
+                                        <a href="{{ route('clients.show', $other['id']) }}" class="focus-ring link">{{ $other['name'] }}</a>
+                                    @else
+                                        {{ $other['name'] }} <span class="text-ink-secondary">(удалён)</span>
+                                    @endif
+                                </p>
                             @endif
                             @break
 

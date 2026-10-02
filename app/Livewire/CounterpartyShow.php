@@ -7,7 +7,10 @@ use App\Livewire\Concerns\EditsFieldsInline;
 use App\Livewire\Concerns\WithActivityHistory;
 use App\Models\Counterparty;
 use App\Models\CounterpartyContact;
+use App\Services\RecordDeleter;
+use DomainException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -65,6 +68,23 @@ class CounterpartyShow extends Component
         $this->counterparty->contacts()->create(array_map(fn ($value) => $value === '' ? null : $value, $data));
 
         $this->cancelContact();
+    }
+
+    /** Окончательное удаление вместе с контактными лицами и историей (подтверждение — wire:confirm на кнопке). */
+    public function destroy(RecordDeleter $deleter)
+    {
+        try {
+            $deleter->delete($this->counterparty);
+        } catch (DomainException $e) {
+            $this->addError('delete', $e->getMessage());
+
+            return;
+        }
+
+        session()->flash('status', 'Контрагент удалён.');
+
+        // Список контрагентов появится в задаче 23; до него — главная.
+        return $this->redirect(Route::has('counterparties.index') ? route('counterparties.index') : route('home'), navigate: false);
     }
 
     // Контактное лицо изменено или удалено в своём компоненте — перерисовываем список и историю.

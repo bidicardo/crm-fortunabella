@@ -1,4 +1,8 @@
 <div class="max-w-3xl space-y-4">
+    @if (session('status'))
+        <x-ui.alert kind="success">{{ session('status') }}</x-ui.alert>
+    @endif
+
     <p class="text-ink-secondary">Заглушка главной страницы: проверка стека Tailwind + Alpine + Livewire.</p>
 
     <div class="flex flex-wrap items-center gap-3">
