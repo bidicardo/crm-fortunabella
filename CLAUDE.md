@@ -36,6 +36,7 @@ CRM для управления клиентами, сделками-мероп�
 - Дизайн-система (цвета тем, шрифт, компоненты): `docs/design/01-design-system.md`, `docs/design/01-themes.md`
 - Чек-лист задач (что сделано и что дальше): `docs/27-task-checklist.md`
 - Переезд на VPS — инструкция для владельца: `docs/28-vps-owner-guide.md`
+- Ускорение локальной работы (проект в WSL): `docs/29-wsl-local-speedup.md`
 - Промпты для Claude Code по фазам: `docs/prompts/`
 
 ## Стек и команды
