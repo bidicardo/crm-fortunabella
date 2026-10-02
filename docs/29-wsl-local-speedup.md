@@ -97,6 +97,13 @@ time ./vendor/bin/sail artisan --version
 Было около 8,5 с, должно стать меньше секунды. Загрузка страниц и
 перетаскивание в канбане — почти мгновенно.
 
+## 7. Сообщить Claude Code
+
+В VS Code, открытом через WSL (шаг 5), написать Claude Code, что переезд
+выполнен. Он обновит в `CLAUDE.md` и `README.md` команды для Linux
+(`./vendor/bin/sail …` вместо `docker compose exec laravel.test …`) и
+проверит, что тесты проходят на новом месте.
+
 ## После переезда
 
 - Работать только в `~/crm-fortunabella`. Папку `F:\crm-fortunabella` не
