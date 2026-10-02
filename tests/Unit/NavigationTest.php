@@ -12,8 +12,8 @@ function itemLabels(): array
 }
 
 it('hides items whose route does not exist and drops empty groups', function () {
-    expect(itemLabels())->toBe(['Главная', 'Клиенты']);
-    expect(Navigation::groups())->toHaveCount(2);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты']);
+    expect(Navigation::groups())->toHaveCount(3);
 });
 
 it('shows a group once one of its routes exists', function () {
@@ -22,8 +22,8 @@ it('shows a group once one of its routes exists', function () {
 
     $groups = Navigation::groups();
 
-    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Задачи']);
-    expect($groups[2]['label'])->toBe('Работа');
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Задачи']);
+    expect($groups[3]['label'])->toBe('Работа');
 });
 
 it('marks only the current item as active', function () {

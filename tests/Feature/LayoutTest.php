@@ -73,7 +73,6 @@ it('has a bottom bar with Home and no tabs for missing routes', function () {
     $this->actingAs(User::factory()->create())->get('/')
         ->assertSee('aria-label="Нижнее меню"', false)
         ->assertSee('viewport-fit=cover', false)
-        ->assertDontSee('Ещё')
         ->assertDontSee('Задачи');
 });
 
@@ -89,10 +88,11 @@ it('shows tabs and More when routes appear', function () {
         ->assertSee('Документы');
 });
 
-it('hides More when there are no extra sections', function () {
-    addRoutes('deals.index', 'tasks.index');
+it('puts sections without a tab (Counterparties) into More', function () {
+    $html = $this->actingAs(User::factory()->create())->get('/')->getContent();
+    $bottom = substr($html, strpos($html, 'aria-label="Нижнее меню"'));
 
-    $this->actingAs(User::factory()->create())->get('/')->assertDontSee('Ещё');
+    expect($bottom)->toContain('Ещё')->toContain('Контрагенты');
 });
 
 it('marks the active tab in the bottom bar', function () {

@@ -118,14 +118,14 @@ describe('counterparty', function () {
         Livewire::test(CounterpartyShow::class, ['counterparty' => $counterparty])
             ->assertSeeHtml('и его контактных лиц (2)')
             ->call('destroy')
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('counterparties.index'));
 
         expect(Counterparty::pluck('id')->all())->toBe([$other->counterparty_id])
             ->and(CounterpartyContact::pluck('id')->all())->toBe([$other->id])
             ->and(ActivityLog::where('subject_type', $counterparty->getMorphClass())->where('subject_id', $counterparty->id)->count())->toBe(0);
 
         $this->get(route('counterparties.show', $counterparty))->assertNotFound();
-        $this->get(route('home'))->assertSee('Контрагент удалён.');
+        $this->get(route('counterparties.index'))->assertSee('Контрагент удалён.');
     });
 
     it('refuses to delete a counterparty with deals', function () {

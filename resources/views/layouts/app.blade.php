@@ -26,8 +26,9 @@
                     <x-user-menu />
                 </header>
 
-                {{-- Нижний отступ на телефоне: чтобы нижняя панель не перекрывала контент --}}
-                <main class="min-w-0 flex-1 p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:p-6">
+                {{-- Нижний отступ на телефоне: чтобы нижняя панель не перекрывала контент.
+                     flex-col: страница может растянуться до низа экрана (flex-1), как канбан. --}}
+                <main class="flex min-w-0 flex-1 flex-col p-4 pb-[calc(5rem+env(safe-area-inset-bottom))] md:p-6">
                     {{ $slot }}
                 </main>
             </div>

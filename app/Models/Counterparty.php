@@ -27,6 +27,17 @@ class Counterparty extends Model
         'position' => 0,
     ];
 
+    protected static function booted(): void
+    {
+        // Новая карточка встаёт в конец колонки своего этапа (если порядок не задан явно).
+        static::creating(function (self $counterparty) {
+            if (! $counterparty->isDirty('position')) {
+                $max = static::stage($counterparty->stage)->max('position');
+                $counterparty->position = $max === null ? 0 : $max + 1;
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return [
