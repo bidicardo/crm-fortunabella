@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Client;
+use App\Models\Deal;
 use App\Models\User;
 use BackedEnum;
 use DomainException;
@@ -16,14 +17,14 @@ class ClientMergeService
 
     /**
      * Связанные записи, которые переезжают от дубля к основному клиенту: классы моделей с колонкой client_id.
-     * В Фазах 4, 6, 7 сюда добавляются сделки, задачи и документы (Deal::class, Task::class, Document::class);
+     * Сделки — с Фазы 4; в Фазах 6, 7 сюда добавляются задачи и документы (Task::class, Document::class);
      * перенос — один запрос UPDATE client_id на связь.
      *
      * @return list<class-string<Model>>
      */
     protected function relations(): array
     {
-        return [];
+        return [Deal::class];
     }
 
     /** Значение поля клиента в виде строки (enum → value), пустое → null. */

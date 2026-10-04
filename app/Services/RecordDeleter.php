@@ -18,8 +18,7 @@ class RecordDeleter
     /** Сколько сделок у записи: пока сделки есть, удалять нельзя. */
     public function dealsCount(Client|Counterparty $record): int
     {
-        // ponytail: сделок до Фазы 4 нет — всегда 0; в Фазе 4 здесь будет $record->deals()->count().
-        return 0;
+        return $record->deals()->count();
     }
 
     /** id влитых в клиента архивных дублей, включая влитых в них раньше (цепочка слияний). */

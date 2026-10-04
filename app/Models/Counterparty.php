@@ -69,6 +69,11 @@ class Counterparty extends Model
         ];
     }
 
+    public function deals(): HasMany
+    {
+        return $this->hasMany(Deal::class);
+    }
+
     public function contacts(): HasMany
     {
         return $this->hasMany(CounterpartyContact::class)->orderBy('full_name');

@@ -52,6 +52,21 @@ Counterparty 1 ──── много ActivityLog
   (`Client`, `Counterparty`; в Фазе 4 — сделки). Записи только
   добавляются, из интерфейса не редактируются и не удаляются.
 
+## Сделка
+
+`Deal` (задача 26) — поля: `title` (обязательно), `client_id`
+(обязательно; клиента со сделками удалить нельзя), `counterparty_id`
+(необязательно; контрагента со сделками удалить нельзя), `amount` и
+`prepayment_amount` (целые рубли), `event_date` и `event_time`,
+`table_types` (список `TableType`), `duration_hours`, `event_kind`
+(характер мероприятия, текст), `guests`, `address`, `lead_source`
+(`LeadSource`) и `lead_source_other`, `prepayment_paid`,
+`prepayment_holder_id` и `sold_by_id` (пользователи; при удалении
+пользователя — пусто), `notes`. Служебные: `stage` (`DealStage`) и
+`position` — только через `moveTo()`, в историю пишется только этап.
+При слиянии клиентов сделки дубля переходят к основному
+(`ClientMergeService::relations()`).
+
 ## Контрагент и контактные лица
 
 `Counterparty` — поля: `name` (обязательно), `type` (свободный текст),

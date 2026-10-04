@@ -6,29 +6,15 @@ use App\Models\ActivityLog;
 use App\Models\Client;
 use App\Models\Counterparty;
 use App\Models\CounterpartyContact;
+use App\Models\Deal;
 use App\Models\User;
 use App\Services\ClientMergeService;
-use App\Services\RecordDeleter;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 // Обычный участник: удалять может любой пользователь, не только создатель.
 beforeEach(fn () => $this->actingAs($this->user = User::factory()->create()));
-
-/** Подставной счётчик сделок (до Фазы 4 сделок нет). */
-function withDeals(int $count): void
-{
-    app()->instance(RecordDeleter::class, new class($count) extends RecordDeleter
-    {
-        public function __construct(private int $count) {}
-
-        public function dealsCount(Client|Counterparty $record): int
-        {
-            return $this->count;
-        }
-    });
-}
 
 describe('client', function () {
     it('deletes a client with its history and returns to the list', function () {
@@ -79,8 +65,8 @@ describe('client', function () {
     });
 
     it('refuses to delete a client with deals and shows why', function () {
-        withDeals(2);
         $client = Client::create(['name' => 'Клиент со сделками']);
+        Deal::factory()->count(2)->for($client)->create();
 
         Livewire::test(ClientShow::class, ['client' => $client])
             ->call('destroy')
@@ -88,7 +74,7 @@ describe('client', function () {
             ->assertHasErrors('delete')
             ->assertSee('Сначала удалите или перенесите сделки: 2.');
 
-        expect(Client::count())->toBe(1)->and($client->activityLogs()->count())->toBe(1);
+        expect(Client::count())->toBe(1)->and($client->activityLogs()->count())->toBe(1)->and(Deal::count())->toBe(2);
     });
 
     it('shows a deleted client in someone else\'s history as a name without a link', function () {
@@ -129,15 +115,15 @@ describe('counterparty', function () {
     });
 
     it('refuses to delete a counterparty with deals', function () {
-        withDeals(1);
         $counterparty = Counterparty::factory()->create();
+        Deal::factory()->for($counterparty)->create();
 
         Livewire::test(CounterpartyShow::class, ['counterparty' => $counterparty])
             ->call('destroy')
             ->assertHasErrors('delete')
             ->assertSee('Сначала удалите или перенесите сделки: 1.');
 
-        expect(Counterparty::count())->toBe(1);
+        expect(Counterparty::count())->toBe(1)->and(Deal::count())->toBe(1);
     });
 });
 

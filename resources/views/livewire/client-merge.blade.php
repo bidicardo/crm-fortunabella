@@ -78,12 +78,12 @@
                         @endif
                     </tr>
                 @endforeach
-                {{-- Связанные данные: сейчас их нет; в Фазах 4, 6, 7 счётчики берутся из связей и переносятся при слиянии. --}}
-                @foreach (['Сделки', 'Задачи', 'Документы'] as $related)
+                {{-- Связанные данные переносятся с дубля на основного. Сделки — с Фазы 4; задачи и документы — Фазы 6, 7. --}}
+                @foreach (['Сделки' => [$client->deals()->count(), $other->deals()->count()], 'Задачи' => [0, 0], 'Документы' => [0, 0]] as $related => [$mine, $theirs])
                     <tr class="border-t border-line">
                         <td class="{{ $td }} text-ink-secondary">{{ $related }}</td>
-                        <td class="{{ $td }}">0</td>
-                        <td class="{{ $td }}">0</td>
+                        <td class="{{ $td }}">{{ $mine }}</td>
+                        <td class="{{ $td }}">{{ $theirs }}</td>
                     </tr>
                 @endforeach
             </tbody>

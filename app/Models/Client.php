@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\Rule;
 
 // archived_at и merged_* намеренно не в fillable: их выставляет только слияние (ClientMergeService).
@@ -112,6 +113,11 @@ class Client extends Model
     public function isArchived(): bool
     {
         return $this->archived_at !== null;
+    }
+
+    public function deals(): HasMany
+    {
+        return $this->hasMany(Deal::class);
     }
 
     /** Клиент, в которого влит этот дубль (история объединения). */
