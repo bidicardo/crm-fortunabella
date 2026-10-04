@@ -79,6 +79,18 @@ it('sorts by name, cooperation start and creation date; ignores unknown columns'
     expect(tableNames($component))->toBe(['Анна', 'Борис']);
 });
 
+it('puts empty cooperation start dates last in both directions', function () {
+    Counterparty::factory()->create(['name' => 'Без даты', 'cooperation_started_at' => null]);
+    Counterparty::factory()->create(['name' => 'Ранний', 'cooperation_started_at' => '2026-01-10']);
+    Counterparty::factory()->create(['name' => 'Поздний', 'cooperation_started_at' => '2026-03-01']);
+
+    $component = Livewire::test(CounterpartyTable::class)->call('sortBy', 'cooperation_started_at');
+    expect(tableNames($component))->toBe(['Ранний', 'Поздний', 'Без даты']);
+
+    $component->call('sortBy', 'cooperation_started_at');
+    expect(tableNames($component))->toBe(['Поздний', 'Ранний', 'Без даты']);
+});
+
 it('paginates by 25', function () {
     Counterparty::factory()->count(30)->create();
 
@@ -140,7 +152,7 @@ it('serves both pages with titles, menu highlight and back arrow', function () {
     $list->assertSee('href="'.route('counterparties.index').'"', false);
 
     $active = $this->get('/counterparties/active')->assertOk()->assertSee('<title>Действующие контрагенты', false);
-    expect($active->getContent())->toMatch('/href="'.preg_quote(route('counterparties.active'), '/').'"\s+title="Действующие контрагенты"\s+aria-current="page"/')
+    expect($active->getContent())->toMatch('/href="'.preg_quote(route('counterparties.active'), '/').'"\s+title="Действующие"\s+aria-current="page"/')
         ->not->toMatch('/href="'.preg_quote(route('counterparties.index'), '/').'"\s+title="Контрагенты"\s+aria-current="page"/')
         ->and(backLink($active->getContent()))->toBe(route('home'));
 

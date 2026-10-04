@@ -8,7 +8,9 @@
             <x-sidebar />
 
             <div class="flex min-w-0 flex-1 flex-col">
-                <header class="flex h-14 items-center justify-between border-b border-line bg-bar px-4 md:px-6">
+                {{-- Закреплена (sticky): при прокрутке длинной страницы панель стоит на месте. z-30 — над шапками
+                     таблиц и выпадающими панелями страницы, под шторкой «Ещё» нижней панели (z-40). --}}
+                <header class="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-bar px-4 md:px-6">
                     <div class="flex min-w-0 items-center gap-2">
                         {{-- Стрелка ведёт в родительский раздел (Navigation::backUrl), а не по истории браузера --}}
                         @if ($backUrl = \App\Support\Navigation::backUrl())

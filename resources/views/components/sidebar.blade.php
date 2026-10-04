@@ -12,7 +12,7 @@
     x-data
     class="hidden shrink-0 flex-col bg-sidebar text-body text-sidebar-ink [--color-accent:var(--color-sidebar-active)] md:sticky md:top-0 md:flex md:h-dvh md:w-64 md:self-start md:collapsed:w-16 border-r border-sidebar-line"
 >
-    <div class="flex h-14 shrink-0 items-center border-b border-sidebar-line px-5 text-h4 font-semibold text-sidebar-strong collapsed:justify-center collapsed:px-0">
+    <div class="flex h-14 shrink-0 items-center px-5 text-h4 font-semibold text-sidebar-strong collapsed:justify-center collapsed:px-0">
         <span class="collapsed:hidden">{{ config('app.name') }}</span>
         <span class="hidden collapsed:inline" aria-hidden="true">F</span>
     </div>

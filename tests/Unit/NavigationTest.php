@@ -12,7 +12,7 @@ function itemLabels(): array
 }
 
 it('hides items whose route does not exist and drops empty groups', function () {
-    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие контрагенты']);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие']);
     expect(Navigation::groups())->toHaveCount(3);
 });
 
@@ -22,7 +22,7 @@ it('shows a group once one of its routes exists', function () {
 
     $groups = Navigation::groups();
 
-    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие контрагенты', 'Задачи']);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие', 'Задачи']);
     expect($groups[3]['label'])->toBe('Работа');
 });
 
@@ -35,7 +35,7 @@ it('marks only the current item as active', function () {
 
     $current = collect(Navigation::groups())->pluck('items')->flatten(1)->where('current', true)->pluck('label')->all();
 
-    expect($current)->toBe(['Действующие контрагенты']);
+    expect($current)->toBe(['Действующие']);
 });
 
 it('leads the back arrow to the parent section', function (string $uri, ?string $expected) {

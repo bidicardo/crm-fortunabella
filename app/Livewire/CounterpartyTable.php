@@ -74,6 +74,8 @@ class CounterpartyTable extends Component
             ->with(['contacts' => fn ($q) => $q->limit(1)])
             ->when($stage, fn (Builder $q, CounterpartyStage $stage) => $q->stage($stage))
             ->when($term !== '', fn (Builder $q) => $q->search($term))
+            // Пустая дата начала сотрудничества — в конце в обоих направлениях (MySQL и SQLite ставят null первым при asc).
+            ->when($sort === 'cooperation_started_at', fn (Builder $q) => $q->orderByRaw('cooperation_started_at is null'))
             ->orderBy($sort, $dir)
             ->orderBy('id', $dir)
             ->paginate(25);
