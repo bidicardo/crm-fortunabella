@@ -29,16 +29,9 @@ cp .env.example .env
 Приложение: http://localhost, письма (Mailpit): http://localhost:8025,
 MySQL с хоста: `127.0.0.1:3306`.
 
-Скрипт `sail` не работает в Git Bash/PowerShell на Windows — там
-запускайте `docker compose` напрямую (после `sail up` те же команды):
-
-```
-$env:WWWUSER=1000; $env:WWWGROUP=1000     # PowerShell
-docker compose up -d
-docker compose exec laravel.test php artisan migrate
-docker compose exec laravel.test php artisan test
-docker compose down
-```
+На Windows проект держится внутри WSL (Ubuntu) и команды запускаются оттуда
+же: `docs/29-wsl-local-speedup.md` (переезд), `docs/30-local-startup.md`
+(запуск после перезагрузки).
 
 Тесты (`phpunit.xml`) используют SQLite in-memory и не требуют MySQL.
 
@@ -119,7 +112,7 @@ production-образа (`npm run build` внутри Dockerfile), папка
 php artisan crm:create-creator        # интерактивно: имя, email, пароль
 ```
 
-В Sail на Windows: `docker compose exec laravel.test php artisan crm:create-creator`.
+В Sail: `./vendor/bin/sail artisan crm:create-creator`.
 Пароль лучше вводить интерактивно, а не опцией `--password` (она
 остаётся в истории команд).
 
@@ -192,8 +185,7 @@ Actions и хранится в приватном реестре GHCR; депл�
 composer check
 ```
 
-В Sail: `docker compose exec laravel.test composer check`
-(или `./vendor/bin/sail composer check` в WSL2).
+В Sail: `./vendor/bin/sail composer check`.
 Отдельно:
 
 ```

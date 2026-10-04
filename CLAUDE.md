@@ -37,6 +37,7 @@ CRM для управления клиентами, сделками-мероп�
 - Чек-лист задач (что сделано и что дальше): `docs/27-task-checklist.md`
 - Переезд на VPS — инструкция для владельца: `docs/28-vps-owner-guide.md`
 - Ускорение локальной работы (проект в WSL): `docs/29-wsl-local-speedup.md`
+- Запуск проекта после перезагрузки: `docs/30-local-startup.md`
 - Промпты для Claude Code по фазам: `docs/prompts/`
 
 ## Стек и команды
@@ -82,9 +83,9 @@ CRM для управления клиентами, сделками-мероп�
 - Ход выполнения задач и фаз — `docs/25-architecture-proposal.md` (раздел
   «Статус выполнения»).
 - Проверка перед коммитом: `composer check` (Pint без автофикса + тесты).
-- Локальное окружение — Sail (Docker); на Windows скрипт `sail` не работает,
-  используй `docker compose exec laravel.test <команда>` (перед `docker compose`
-  задать `WWWUSER=1000 WWWGROUP=1000`).
+- Локальное окружение — Sail (Docker), проект лежит в WSL (`~/crm-fortunabella`);
+  команды в контейнере — `./vendor/bin/sail <команда>` (`sail artisan …`,
+  `sail composer check`, `sail npm run build`).
 - Фронтенд собирается локально (`npm run build`) для разработки и в CI при сборке
   production-образа; `public/build` в Git не хранится.
 

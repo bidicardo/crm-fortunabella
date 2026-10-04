@@ -43,12 +43,19 @@ docker compose down
 
 Открыть **Ubuntu** из меню «Пуск» и выполнить по очереди:
 ```
+git config --global --add safe.directory /mnt/f/crm-fortunabella/.git
 git clone /mnt/f/crm-fortunabella ~/crm-fortunabella
 cd ~/crm-fortunabella
 git remote set-url origin https://github.com/bidicardo/crm-fortunabella.git
 cp /mnt/f/crm-fortunabella/.env .env
 cp -r /mnt/f/crm-fortunabella/vendor .
 ```
+- Первая команда обязательна: без неё `git clone` из `/mnt/f` падает с
+  ошибкой «dubious ownership» (папка на диске Windows принадлежит другому
+  пользователю).
+- В команде копирования `vendor` в конце стоят **пробел и точка**
+  (`… vendor .`) — точка означает «в текущую папку»; без них команда не
+  сработает.
 - `.env` в Git не хранится — копируется отдельно и остаётся только на
   этом компьютере.
 - `vendor` копируется, чтобы не скачивать заново. `node_modules` не
