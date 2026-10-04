@@ -38,3 +38,7 @@ auth.json
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Временный промпт браузерной проверки и отчёт тестировщика (перезаписываются каждой задачей)
+/docs/temp-prompt-browser-check.md
+/otchet.md

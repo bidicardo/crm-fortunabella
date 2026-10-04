@@ -59,14 +59,14 @@ class CounterpartyBoard extends Component
         });
     }
 
-    /** Смена этапа без перетаскивания (список на карточке): в конец колонки. */
+    /** Смена этапа без перетаскивания (список на карточке): в начало колонки (позиция меньше всех в ней). */
     public function changeStage(mixed $id, mixed $stage): void
     {
         $stage = CounterpartyStage::tryFrom((string) $stage) ?? abort(404);
         $card = Counterparty::findOrFail((int) $id);
 
         if ($stage !== $card->stage) {
-            $card->moveTo($stage);
+            $card->moveTo($stage, (int) Counterparty::stage($stage)->min('position') - 1);
         }
     }
 

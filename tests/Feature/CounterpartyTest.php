@@ -18,7 +18,7 @@ it('creates a counterparty with only a name at the first contact stage', functio
 it('lists stages in kanban order with labels and badge tones', function () {
     expect(array_map(fn ($s) => [$s->label(), $s->tone()], CounterpartyStage::cases()))->toBe([
         ['Первый контакт', 'stage-inwork'],
-        ['Дожим', 'stage-done'],
+        ['Дожим', 'stage-booked'],
         ['Сотрудничаем', 'stage-new'],
         ['Отказ', 'stage-refused'],
     ]);

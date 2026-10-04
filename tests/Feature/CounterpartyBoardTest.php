@@ -39,9 +39,22 @@ it('shows four columns in stage order with counters and the main fields', functi
         ->assertSeeHtml('href="'.route('counterparties.show', $agency).'"')
         ->assertSeeHtml('href="'.route('counterparties.create', ['stage' => 'pushing']).'"')
         ->assertSeeHtml('wire:sort:group-id="pushing"')
-        ->assertSeeHtml('wire:sort:item="'.$agency->id.'"');
+        ->assertSeeHtml('wire:sort:item="'.$agency->id.'"')
+        // Цвет этапа: линия слева у карточки и окрашенный список этапа (Дожим — stage-booked, Отказ — stage-refused)
+        ->assertSeeHtml('border-left: 4px solid var(--color-stage-booked)')
+        ->assertSeeHtml('color: var(--color-stage-booked); border-color: var(--color-stage-booked)')
+        ->assertSeeHtml('border-left: 4px solid var(--color-stage-refused)');
 
     $this->get(route('counterparties.index'))->assertOk()->assertSee('Новый контрагент');
+});
+
+it('recolors the card after a stage change', function () {
+    $card = Counterparty::factory()->pushing()->create();
+
+    Livewire::test(CounterpartyBoard::class)
+        ->call('changeStage', $card->id, CounterpartyStage::Cooperating->value)
+        ->assertSeeHtml('border-left: 4px solid var(--color-stage-new)')
+        ->assertDontSeeHtml('border-left: 4px solid var(--color-stage-booked)');
 });
 
 it('puts a new counterparty at the end of its column', function () {
@@ -86,12 +99,14 @@ it('rejects a wrong stage or a missing card without changes', function () {
     expect($card->fresh()->stage)->toBe(CounterpartyStage::FirstContact);
 });
 
-it('changes the stage without dragging', function () {
+it('changes the stage without dragging and puts the card first in the column', function () {
     $card = Counterparty::factory()->create(['name' => 'Площадка']);
+    Counterparty::factory()->pushing()->create(['name' => 'Тамада']);
+    Counterparty::factory()->pushing()->create(['name' => 'Ресторан']);
 
     $component = Livewire::test(CounterpartyBoard::class)->call('changeStage', $card->id, 'pushing');
 
-    expect(column($component, CounterpartyStage::Pushing))->toBe(['Площадка'])
+    expect(column($component, CounterpartyStage::Pushing))->toBe(['Площадка', 'Тамада', 'Ресторан'])
         ->and($card->activityLogs()->where('event', 'updated')->count())->toBe(1);
 });
 

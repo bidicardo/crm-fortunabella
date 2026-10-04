@@ -20,12 +20,12 @@ enum CounterpartyStage: string
         };
     }
 
-    /** Тон <x-ui.badge>: синий, оранжевый, зелёный, красный (docs/design/01-design-system.md §1.3). */
+    /** Тон <x-ui.badge>: синий, фиолетовый, зелёный, красный (docs/design/01-design-system.md §1.3). */
     public function tone(): string
     {
         return match ($this) {
             self::FirstContact => 'stage-inwork',
-            self::Pushing => 'stage-done',
+            self::Pushing => 'stage-booked',
             self::Cooperating => 'stage-new',
             self::Refused => 'stage-refused',
         };

@@ -3,10 +3,15 @@
      (Livewire перестаёт разбирать атрибуты на wire:sort:group). На касание — удержание пальцем
      300 мс перед переносом, чтобы прокрутка не начинала перетаскивание. Без перетаскивания этап
      меняется списком на карточке. Видимые поля карточки — в браузере (localStorage).
-     Канбан и колонки растянуты до низа экрана: свайп вбок и бросок карточки работают по всей высоте.
+     Канбан ровно по высоте экрана (страница не прокручивается), каждая колонка прокручивается сама,
+     заголовок колонки на месте. Высота = экран − верхняя панель (3,5rem) − отступы main из layouts/app
+     (телефон: 1rem сверху + 5rem и безопасная зона под нижней панелью; от md: 1,5rem + 1,5rem) — при
+     смене отступов main поправить здесь. min-h-96: в очень низком окне колонки не схлопываются.
+     На компьютере колонки делят ширину поровну, уже min-w-64 — прокрутка блока вбок; телефон — w-72.
+     Линия слева и список этапа — цвет этапа (tone).
      fallbackOnBody: копия переносимой карточки (на iPhone) кладётся в body, иначе её обрезает блок прокрутки. --}}
 <div
-    class="flex min-w-0 flex-1 flex-col gap-4"
+    class="flex h-[calc(100dvh-9.5rem-env(safe-area-inset-bottom))] min-h-96 min-w-0 flex-col gap-4 md:h-[calc(100dvh-6.5rem)]"
     x-data="{
         fields: (() => {
             const defaults = { type: true, phone: true, contact: true };
@@ -52,10 +57,10 @@
     </div>
 
     {{-- relative: абсолютные элементы внутри прокручиваемого блока не растягивают страницу на iPhone --}}
-    <div class="relative -mx-4 flex flex-1 items-stretch gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
+    <div class="relative -mx-4 flex min-h-0 flex-1 items-stretch gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:px-0">
         @foreach ($columns as $column)
             @php($stage = $column['stage'])
-            <section class="flex w-72 shrink-0 flex-col rounded-lg border border-line bg-surface" aria-label="{{ $stage->label() }}" wire:key="column-{{ $stage->value }}">
+            <section class="flex w-72 shrink-0 flex-col rounded-lg border border-line bg-surface md:w-auto md:min-w-64 md:flex-1" aria-label="{{ $stage->label() }}" wire:key="column-{{ $stage->value }}">
                 <header class="flex items-center justify-between gap-2 border-b border-line px-3 py-2">
                     <div class="flex items-center gap-2">
                         <x-ui.badge :tone="$stage->tone()">{{ $stage->label() }}</x-ui.badge>
@@ -67,14 +72,15 @@
                     </a>
                 </header>
 
-                <div class="flex min-h-24 flex-1 flex-col gap-2 p-2"
+                <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain p-2"
                     wire:sort="moveCard"
                     wire:sort:group="counterparties"
                     wire:sort:group-id="{{ $stage->value }}"
                     wire:sort:config="{ delay: 300, delayOnTouchOnly: true, fallbackOnBody: true }">
                     @foreach ($column['cards'] as $card)
                         <article wire:key="card-{{ $card->id }}" wire:sort:item="{{ $card->id }}"
-                            class="cursor-grab space-y-1 rounded-md border border-line bg-page p-3 shadow-sm active:cursor-grabbing">
+                            class="cursor-grab space-y-1 rounded-md border border-line bg-page p-3 shadow-sm active:cursor-grabbing"
+                            style="border-left: 4px solid var(--color-{{ $card->stage->tone() }});">
                             <a href="{{ route('counterparties.show', $card) }}" class="focus-ring link block break-words font-semibold">{{ $card->name }}</a>
 
                             @if ($card->type)
@@ -91,7 +97,7 @@
 
                             {{-- Смена этапа без перетаскивания; список не начинает перенос --}}
                             <div wire:sort:ignore class="pt-1">
-                                <x-ui.select id="stage-{{ $card->id }}" aria-label="Этап: {{ $card->name }}"
+                                <x-ui.select id="stage-{{ $card->id }}" :tone="$card->stage->tone()" aria-label="Этап: {{ $card->name }}"
                                     wire:change="changeStage({{ $card->id }}, $event.target.value)">
                                     @foreach ($stages as $option)
                                         <option value="{{ $option->value }}" @selected($option === $card->stage)>{{ $option->label() }}</option>

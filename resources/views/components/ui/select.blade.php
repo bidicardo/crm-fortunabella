@@ -3,6 +3,8 @@
     'id' => null,
     'name' => null,
     'error' => null,
+    // Цвет этапа (stage-new, stage-inwork…): текст и рамка этого цвета, фон — слабый оттенок (8 %: контраст текста AA в обеих темах)
+    'tone' => null,
 ])
 
 @php
@@ -12,6 +14,9 @@
     // Правый отступ под стрелку задаёт общее правило select в app.css.
     $classes = 'focus-ring w-full rounded-md border bg-surface px-3 py-2 text-body text-ink disabled:cursor-not-allowed disabled:opacity-50 '
         .($error ? 'border-error' : 'border-line');
+    $style = $tone && ! $error
+        ? "color: var(--color-{$tone}); border-color: var(--color-{$tone}); background-color: color-mix(in srgb, var(--color-{$tone}) 8%, var(--color-page));"
+        : null;
 @endphp
 
 <div>
@@ -23,6 +28,7 @@
         @if ($id) id="{{ $id }}" @endif
         @if ($name) name="{{ $name }}" @endif
         @if ($error) aria-invalid="true" @endif
+        @if ($style) style="{{ $style }}" @endif
         {{ $attributes->merge(['class' => $classes]) }}
     >
         {{ $slot }}
