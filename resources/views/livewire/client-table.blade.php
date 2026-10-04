@@ -12,8 +12,12 @@
     $sortable = ['name', 'created_at', 'updated_at'];
 @endphp
 
+{{-- Список ровно по высоте экрана (h-main, как канбан): страница не прокручивается, таблица прокручивается
+     внутри блока (min-h-0 — сжимается, если строк больше, чем помещается; если меньше — не растягивается),
+     шапка таблицы закреплена, переключатель страниц всегда виден. wire:key с номером страницы и сортировкой:
+     новая страница открывается с начала таблицы, а не с прежней прокрутки блока. --}}
 <div
-    class="space-y-4"
+    class="flex h-main flex-col gap-4"
     x-data="{
         cols: (() => {
             const defaults = { phone: true, email: true, social: true, legal_type: true, role: true, created_at: true, updated_at: false };
@@ -47,7 +51,7 @@
             <x-ui.button variant="secondary" x-ref="columnsButton" aria-haspopup="true" x-bind:aria-expanded="open" x-on:click="open = !open">Колонки</x-ui.button>
 
             {{-- x-anchor (Alpine, в комплекте Livewire) сдвигает панель, чтобы на узком экране она не уходила за край --}}
-            <x-ui.panel x-show="open" x-cloak x-anchor.bottom-start.offset.4="$refs.columnsButton" class="z-10 w-56">
+            <x-ui.panel x-show="open" x-cloak x-anchor.bottom-start.offset.4="$refs.columnsButton" class="z-20 w-56">
                 <div class="px-3">
                     <x-ui.checkbox id="col-name" label="Имя" checked disabled />
                 </div>
@@ -62,8 +66,8 @@
         <x-ui.button :href="route('clients.create')" icon="plus" class="sm:ml-auto">Новый клиент</x-ui.button>
     </div>
 
-    <x-ui.table>
-        <thead class="bg-surface">
+    <x-ui.table class="min-h-0 overflow-y-auto" wire:key="clients-{{ $clients->currentPage() }}-{{ $sort }}-{{ $dir }}">
+        <thead class="sticky top-0 z-10 bg-surface">
             <tr>
                 @foreach (['name' => 'Имя'] + $columns as $key => $label)
                     <th

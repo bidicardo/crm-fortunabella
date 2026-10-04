@@ -14,8 +14,10 @@
     // Правый отступ под стрелку задаёт общее правило select в app.css.
     $classes = 'focus-ring w-full rounded-md border bg-surface px-3 py-2 text-body text-ink disabled:cursor-not-allowed disabled:opacity-50 '
         .($error ? 'border-error' : 'border-line');
+    // Цвет этапа приглушается серым на --stage-mute (тёмная тема — 30 %, светлая — 0 %), как линия карточки канбана.
+    $color = "color-mix(in srgb, var(--color-{$tone}), var(--color-ink-muted) var(--stage-mute))";
     $style = $tone && ! $error
-        ? "color: var(--color-{$tone}); border-color: var(--color-{$tone}); background-color: color-mix(in srgb, var(--color-{$tone}) 8%, var(--color-page));"
+        ? "color: {$color}; border-color: {$color}; background-color: color-mix(in srgb, {$color} 8%, var(--color-page));"
         : null;
 @endphp
 

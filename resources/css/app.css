@@ -33,6 +33,19 @@ body {
     overflow-x: clip;
 }
 
+/* Полосы прокрутки скрыты везде (страница, канбан, таблицы, панели; ПК и телефон) — решение владельца.
+   Прокрутка колесом, свайпом, клавишами и автопрокрутка при перетаскивании работают. */
+* {
+    scrollbar-width: none;
+    /* Без «оттягивания» за край на iPhone (пустое поле при свайпе за границу страницы, таблицы, колонки)
+       и без передачи прокрутки родителю: блоки стоят строго в своих границах — решение владельца. */
+    overscroll-behavior: none;
+}
+
+*::-webkit-scrollbar {
+    display: none;
+}
+
 /* Поле даты: iOS Safari рисует его со своей минимальной шириной (вылезает из карточки и наезжает
    на соседние кнопки) и без значения схлопывает по высоте. Сбрасываем системный вид, высота — как у
    текстового поля, дата — по левому краю. */
@@ -81,6 +94,8 @@ input[type='date']::-webkit-date-and-time-value {
     --color-accent-fill: #904d30;
     --color-accent-hover: #7a3f26;
     --color-accent-active: #663420;
+    /* Текст на заливке accent-fill (основная кнопка, текущая страница) */
+    --color-on-accent: #ffffff;
     --color-success: #1e7a34;
     --color-warning: #8a5a00;
     --color-error: #c62828;
@@ -91,23 +106,26 @@ input[type='date']::-webkit-date-and-time-value {
     --color-stage-booked: #7e3fbf;
     --color-stage-done: #a34e0a;
     --color-stage-refused: #c62828;
+    /* Приглушение цвета этапа внутри карточки канбана (линия, список этапа) — доля серого ink-muted;
+       метка этапа в заголовке колонки не приглушается. Светлая тема — без приглушения. */
+    --stage-mute: 0%;
 
     /* Левое меню в светлой теме — светло-бежевое, цвет фигур на странице входа
-       (#CBB9A4 40% поверх #FAF9F6; решение владельца): пункты — кнопки на подложке item
-       с рамкой line, активный пункт залит цветом основной кнопки; strong — заголовок и
-       текст при наведении, active — рамка фокуса */
+       (#CBB9A4 40% поверх #FAF9F6; решение владельца). Пункты плоские, как в тёмной теме
+       (Claude): без рамки и подложки, наведение — hover, текущий — бежевая плашка current
+       с тёмным текстом; strong — заголовок и текст при наведении, active — рамка фокуса */
     --color-sidebar: #e7dfd5;
-    --color-sidebar-item: #ded3c5;
-    --color-sidebar-hover: #d4c6b4;
-    --color-sidebar-current: #904d30;
+    --color-sidebar-hover: #ded3c5;
+    --color-sidebar-current: #d4c6b4;
+    --color-sidebar-current-ink: #3a2e26;
     --color-sidebar-line: #cbb9a4;
     --color-sidebar-ink: #3a2e26;
     --color-sidebar-strong: #3a2e26;
     --color-sidebar-label: #6b5d52;
     --color-sidebar-active: #904d30;
 
-    /* Верхняя и нижняя панели — чуть темнее фона страницы */
-    --color-bar: #f4f1ea;
+    /* Верхняя и нижняя панели — цвета фона, отделены линией (как в тёмной теме) */
+    --color-bar: #faf9f6;
 
     /* Логотип (трафарет public/images/logo.png, окрашивается этим цветом) */
     --color-logo: #533727;
@@ -117,8 +135,6 @@ input[type='date']::-webkit-date-and-time-value {
     --radius-md: 0.5rem;
     --radius-lg: 0.875rem;
 
-    /* Тень выпадающих панелей — светлая тема, в .dark переопределена */
-    --shadow-panel: 0 4px 16px -4px rgb(0 0 0 / 0.12);
 
     /* Типографика (Inter 400/600/700) */
     --text-h1: 3rem; /* 48px */
@@ -147,47 +163,62 @@ input[type='date']::-webkit-date-and-time-value {
     --text-caption--letter-spacing: -0.1px;
 }
 
-/* Тёмная тема — референс 1 «Verus» (docs/design/01-themes.md) */
+/* Тень выпадающих панелей: светлая тема, в .dark переопределена. Не в @theme: значения --shadow-* из @theme
+   Tailwind вписывает прямо в утилиту, и переопределение в .dark не действовало. :root — до .dark (та же
+   специфичность, побеждает позднее правило). */
+:root {
+    --shadow-panel: 0 4px 16px -4px rgb(0 0 0 / 0.12);
+}
+
+@utility shadow-panel {
+    box-shadow: var(--shadow-panel);
+}
+
+/* Тёмная тема — палитра Claude (docs/design/01-themes.md, refs/Claude-dark-theme.png): почти чёрный
+   нейтральный фон, рамки вместо заливок, белая основная кнопка с тёмным текстом, синие ссылки, фокус и
+   переключатели, оранжевого нет. Контраст текста — в docs/design/01-design-system.md §1.1. */
 .dark {
-    --color-page: #131516;
-    --color-surface: #1b1f27;
-    --color-line: #4a5568;
-    --color-line-accent: #4a5568;
-    --color-ink: #f5f7fa;
-    --color-ink-secondary: #a0aec0;
-    --color-ink-muted: #718096;
-    --color-accent: #029cf5;
-    --color-accent-fill: #162ba9;
-    /* Тёмный синий из палитры и так самый насыщенный — для наведения/нажатия
-       он же дополнительно затемнён (см. §6.1 docs/design/01-design-system.md). */
-    --color-accent-hover: #132590;
-    --color-accent-active: #0f1e76;
+    --color-page: #151515;
+    --color-surface: #20201f;
+    --color-line: #2d2d2d;
+    --color-line-accent: #383838;
+    --color-ink: #f0efec;
+    --color-ink-secondary: #c3c2b7;
+    --color-ink-muted: #898781;
+    --color-accent: #4d94e8;
+    --color-accent-fill: #ffffff;
+    --color-accent-hover: #e8e7e3;
+    --color-accent-active: #d6d5d0;
+    --color-on-accent: #151515;
     --color-success: #00ac4f;
     --color-warning: #ffba2f;
-    --color-error: #f13636;
+    --color-error: #f87171;
     --color-danger: #c62828;
-    --color-info: #029cf5;
+    --color-info: #4d94e8;
     --color-stage-new: #22c55e;
     --color-stage-inwork: #38bdf8;
     --color-stage-booked: #c084fc;
     --color-stage-done: #fb923c;
     --color-stage-refused: #f87171;
+    --stage-mute: 30%;
 
-    --color-sidebar: #131516;
-    --color-sidebar-item: #1b1f27;
-    --color-sidebar-hover: #262b36;
-    --color-sidebar-current: #162ba9;
-    --color-sidebar-line: #4a5568;
-    --color-sidebar-ink: #a0aec0;
-    --color-sidebar-strong: #ffffff;
-    --color-sidebar-label: #718096;
-    --color-sidebar-active: #5d88f4;
+    /* Левое меню — плоское, как в Claude: пункты без рамки и подложки, текущий — серая плашка */
+    --color-sidebar: #111111;
+    --color-sidebar-hover: #262626;
+    --color-sidebar-current: #343434;
+    --color-sidebar-current-ink: #f0efec;
+    --color-sidebar-line: #292929;
+    --color-sidebar-ink: #c3c2b7;
+    --color-sidebar-strong: #f0efec;
+    --color-sidebar-label: #898781;
+    --color-sidebar-active: #4d94e8;
 
-    --color-bar: #0e0f10;
+    /* Панели — цвета фона, отделены линией (в Claude панель цветом не выделена) */
+    --color-bar: #151515;
 
-    --color-logo: #f5f7fa;
+    --color-logo: #f0efec;
 
-    --shadow-panel: 0 4px 16px -4px rgb(0 0 0 / 0.4);
+    --shadow-panel: 0 8px 24px -6px rgb(0 0 0 / 0.6);
 
     /* Системные элементы (списки select, полосы прокрутки) — тоже тёмные */
     color-scheme: dark;
@@ -198,6 +229,19 @@ input[type='date']::-webkit-date-and-time-value {
     &:focus-visible {
         outline: 2px solid var(--color-accent);
         outline-offset: 2px;
+    }
+}
+
+/* Высота области контента ровно по экрану: страница не прокручивается, прокручиваются блоки внутри
+   (колонки канбана, таблицы списков). Экран − верхняя панель (3,5rem) − отступы main из layouts/app
+   (телефон: 1rem сверху + 5rem и безопасная зона под нижней панелью; от md: 1,5rem + 1,5rem) — при
+   смене отступов main поправить здесь. min-height: в очень низком окне блоки не схлопываются. */
+@utility h-main {
+    height: calc(100dvh - 9.5rem - env(safe-area-inset-bottom));
+    min-height: 24rem;
+
+    @media (width >= 48rem) {
+        height: calc(100dvh - 6.5rem);
     }
 }
 

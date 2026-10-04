@@ -7,15 +7,15 @@
         {{-- Декоративный фон по референсу 5 (docs/design/refs/05-login.png): только CSS.
              Фигуры обрезаются своим fixed-блоком с overflow-hidden, поэтому страница
              не получает горизонтальной прокрутки. --}}
-        @php $shape = 'absolute rounded-full bg-line-accent/40 dark:bg-accent-fill/25'; @endphp
+        @php $shape = 'absolute rounded-full bg-line-accent/40 dark:bg-line-accent/60'; @endphp
         <div aria-hidden="true" class="pointer-events-none fixed inset-0 overflow-hidden">
             <div class="{{ $shape }} -right-40 top-16 h-64 w-[46rem] -rotate-40"></div>
             <div class="{{ $shape }} -right-32 bottom-20 hidden h-36 w-[32rem] -rotate-40 sm:block"></div>
             <div class="{{ $shape }} -bottom-16 -left-28 h-36 w-[28rem] -rotate-40"></div>
             <div class="{{ $shape }} left-[8%] top-[55%] hidden h-32 w-32 sm:block"></div>
             <div class="{{ $shape }} left-[5%] top-[18%] hidden h-3 w-3 sm:block"></div>
-            <x-icon name="plus" class="absolute left-[14%] top-[8%] hidden h-8 w-8 text-line-accent dark:text-accent-fill sm:block" />
-            <x-icon name="plus" class="absolute left-[12%] top-[28%] hidden h-6 w-6 text-line-accent dark:text-accent-fill sm:block" />
+            <x-icon name="plus" class="absolute left-[14%] top-[8%] hidden h-8 w-8 text-line-accent sm:block" />
+            <x-icon name="plus" class="absolute left-[12%] top-[28%] hidden h-6 w-6 text-line-accent sm:block" />
         </div>
 
         {{-- Отступы под вырез и индикатор «домой». На телефоне всё компактнее, чтобы без клавиатуры

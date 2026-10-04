@@ -1,10 +1,11 @@
 {{-- Левое меню: только от 768 px. Свёрнутое состояние — класс sidebar-collapsed на <html>.
      Цвета sidebar-*: светло-бежевое в светлой теме (как фигуры страницы входа), тёмное в тёмной; рамка фокуса внутри — своим цветом.
      Закреплено на высоту окна (sticky): иначе на длинной странице «Свернуть» уходит за нижний край.
-     Пункты и «Свернуть» — кнопки на подложке; блоки разделены светлыми линиями. --}}
+     Пункты и «Свернуть» плоские, как в Claude (обе темы): без рамки и подложки, наведение — sidebar-hover,
+     текущий — плашка sidebar-current; блоки разделены линиями. --}}
 @php
     $button = 'focus-ring flex min-h-11 w-full items-center gap-3 rounded-md border px-3 collapsed:justify-center collapsed:px-0';
-    $idle = 'border-sidebar-line bg-sidebar-item hover:bg-sidebar-hover hover:text-sidebar-strong';
+    $idle = 'border-transparent hover:bg-sidebar-hover hover:text-sidebar-strong';
 @endphp
 
 <aside
@@ -28,7 +29,7 @@
                         href="{{ $item['url'] }}"
                         title="{{ $item['label'] }}"
                         @if ($item['current']) aria-current="page" @endif
-                        class="{{ $button }} {{ $item['current'] ? 'border-sidebar-current bg-sidebar-current font-semibold text-white' : $idle }}"
+                        class="{{ $button }} {{ $item['current'] ? 'border-sidebar-current bg-sidebar-current font-semibold text-sidebar-current-ink' : $idle }}"
                     >
                         <x-icon :name="$item['icon']" />
                         <span class="truncate collapsed:hidden">{{ $item['label'] }}</span>

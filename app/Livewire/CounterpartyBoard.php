@@ -59,14 +59,21 @@ class CounterpartyBoard extends Component
         });
     }
 
-    /** Смена этапа без перетаскивания (список на карточке): в начало колонки (позиция меньше всех в ней). */
+    /**
+     * Смена этапа без перетаскивания (список на карточке): в начало колонки — позиции колонки сдвигаются
+     * на 1, карточка встаёт на 0 (position беззнаковая, отрицательной быть не может). toBase(): без
+     * updated_at у сдвинутых карточек — position служебное поле.
+     */
     public function changeStage(mixed $id, mixed $stage): void
     {
         $stage = CounterpartyStage::tryFrom((string) $stage) ?? abort(404);
         $card = Counterparty::findOrFail((int) $id);
 
         if ($stage !== $card->stage) {
-            $card->moveTo($stage, (int) Counterparty::stage($stage)->min('position') - 1);
+            DB::transaction(function () use ($card, $stage) {
+                Counterparty::stage($stage)->toBase()->increment('position');
+                $card->moveTo($stage, 0);
+            });
         }
     }
 

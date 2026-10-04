@@ -43,7 +43,7 @@ $pageName = $paginator->getPageName();
                         @foreach ($element as $number => $url)
                             <span wire:key="paginator-{{ $pageName }}-page{{ $number }}">
                                 @if ($number == $paginator->currentPage())
-                                    <span class="{{ $page }} bg-accent-fill font-semibold text-white" aria-current="page">{{ $number }}</span>
+                                    <span class="{{ $page }} bg-accent-fill font-semibold text-on-accent" aria-current="page">{{ $number }}</span>
                                 @else
                                     <button type="button" wire:click="gotoPage({{ $number }}, '{{ $pageName }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}"
                                         class="{{ $page }} hover:bg-line/50" aria-label="Страница {{ $number }}">{{ $number }}</button>

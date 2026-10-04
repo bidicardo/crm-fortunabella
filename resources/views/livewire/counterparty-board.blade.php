@@ -3,15 +3,13 @@
      (Livewire перестаёт разбирать атрибуты на wire:sort:group). На касание — удержание пальцем
      300 мс перед переносом, чтобы прокрутка не начинала перетаскивание. Без перетаскивания этап
      меняется списком на карточке. Видимые поля карточки — в браузере (localStorage).
-     Канбан ровно по высоте экрана (страница не прокручивается), каждая колонка прокручивается сама,
-     заголовок колонки на месте. Высота = экран − верхняя панель (3,5rem) − отступы main из layouts/app
-     (телефон: 1rem сверху + 5rem и безопасная зона под нижней панелью; от md: 1,5rem + 1,5rem) — при
-     смене отступов main поправить здесь. min-h-96: в очень низком окне колонки не схлопываются.
+     Канбан ровно по высоте экрана (h-main, страница не прокручивается), каждая колонка прокручивается
+     сама, заголовок колонки на месте.
      На компьютере колонки делят ширину поровну, уже min-w-64 — прокрутка блока вбок; телефон — w-72.
-     Линия слева и список этапа — цвет этапа (tone).
+     Линия слева и список этапа — цвет этапа (tone), в тёмной теме приглушён (--stage-mute); метка в заголовке — нет.
      fallbackOnBody: копия переносимой карточки (на iPhone) кладётся в body, иначе её обрезает блок прокрутки. --}}
 <div
-    class="flex h-[calc(100dvh-9.5rem-env(safe-area-inset-bottom))] min-h-96 min-w-0 flex-col gap-4 md:h-[calc(100dvh-6.5rem)]"
+    class="flex h-main min-w-0 flex-col gap-4"
     x-data="{
         fields: (() => {
             const defaults = { type: true, phone: true, contact: true };
@@ -28,7 +26,7 @@
     <div class="flex flex-wrap items-center gap-3">
         @if (Route::has('counterparties.list'))
             <div class="inline-flex rounded-md border border-line p-0.5" role="group" aria-label="Вид">
-                <span class="inline-flex min-h-10 items-center rounded-sm bg-accent-fill px-3 font-semibold text-white" aria-current="page">Канбан</span>
+                <span class="inline-flex min-h-10 items-center rounded-sm bg-accent-fill px-3 font-semibold text-on-accent" aria-current="page">Канбан</span>
                 <a href="{{ route('counterparties.list') }}" class="focus-ring inline-flex min-h-10 items-center rounded-sm px-3 hover:bg-line/50">Список</a>
             </div>
         @endif
@@ -72,7 +70,7 @@
                     </a>
                 </header>
 
-                <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-y-contain p-2"
+                <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-2"
                     wire:sort="moveCard"
                     wire:sort:group="counterparties"
                     wire:sort:group-id="{{ $stage->value }}"
@@ -80,7 +78,7 @@
                     @foreach ($column['cards'] as $card)
                         <article wire:key="card-{{ $card->id }}" wire:sort:item="{{ $card->id }}"
                             class="cursor-grab space-y-1 rounded-md border border-line bg-page p-3 shadow-sm active:cursor-grabbing"
-                            style="border-left: 4px solid var(--color-{{ $card->stage->tone() }});">
+                            style="border-left: 4px solid color-mix(in srgb, var(--color-{{ $card->stage->tone() }}), var(--color-ink-muted) var(--stage-mute));">
                             <a href="{{ route('counterparties.show', $card) }}" class="focus-ring link block break-words font-semibold">{{ $card->name }}</a>
 
                             @if ($card->type)

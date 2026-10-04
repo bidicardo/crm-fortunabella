@@ -40,10 +40,10 @@ it('shows four columns in stage order with counters and the main fields', functi
         ->assertSeeHtml('href="'.route('counterparties.create', ['stage' => 'pushing']).'"')
         ->assertSeeHtml('wire:sort:group-id="pushing"')
         ->assertSeeHtml('wire:sort:item="'.$agency->id.'"')
-        // Цвет этапа: линия слева у карточки и окрашенный список этапа (Дожим — stage-booked, Отказ — stage-refused)
-        ->assertSeeHtml('border-left: 4px solid var(--color-stage-booked)')
-        ->assertSeeHtml('color: var(--color-stage-booked); border-color: var(--color-stage-booked)')
-        ->assertSeeHtml('border-left: 4px solid var(--color-stage-refused)');
+        // Цвет этапа (приглушается --stage-mute): линия слева у карточки и окрашенный список этапа (Дожим — stage-booked, Отказ — stage-refused)
+        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))')
+        ->assertSeeHtml('color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute)); border-color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))')
+        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-refused), var(--color-ink-muted) var(--stage-mute))');
 
     $this->get(route('counterparties.index'))->assertOk()->assertSee('Новый контрагент');
 });
@@ -53,8 +53,8 @@ it('recolors the card after a stage change', function () {
 
     Livewire::test(CounterpartyBoard::class)
         ->call('changeStage', $card->id, CounterpartyStage::Cooperating->value)
-        ->assertSeeHtml('border-left: 4px solid var(--color-stage-new)')
-        ->assertDontSeeHtml('border-left: 4px solid var(--color-stage-booked)');
+        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-new), var(--color-ink-muted) var(--stage-mute))')
+        ->assertDontSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))');
 });
 
 it('puts a new counterparty at the end of its column', function () {
@@ -107,6 +107,8 @@ it('changes the stage without dragging and puts the card first in the column', f
     $component = Livewire::test(CounterpartyBoard::class)->call('changeStage', $card->id, 'pushing');
 
     expect(column($component, CounterpartyStage::Pushing))->toBe(['Площадка', 'Тамада', 'Ресторан'])
+        // position беззнаковая в MySQL: отрицательная позиция там падает с ошибкой (SQLite её пропускает)
+        ->and(Counterparty::min('position'))->toBeGreaterThanOrEqual(0)
         ->and($card->activityLogs()->where('event', 'updated')->count())->toBe(1);
 });
 
