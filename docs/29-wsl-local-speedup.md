@@ -120,5 +120,18 @@ time ./vendor/bin/sail artisan --version
 - Команды `docker compose exec laravel.test …` из `CLAUDE.md` и
   `README.md` в Linux заменяются на `./vendor/bin/sail …` — после
   переезда эти места обновляются.
+- Если `git push` из Ubuntu зависает или пишет `Failed to connect to
+  github.com port 443`, а в Windows GitHub открывается (через VPN), то
+  WSL идёт в сеть мимо VPN. Исправление (Windows 11): открыть
+  `notepad %USERPROFILE%\.wslconfig` (Win + R), вписать
+  ```
+  [wsl2]
+  networkingMode=mirrored
+  ```
+  сохранить, закрыть VS Code, в PowerShell выполнить `wsl --shutdown`,
+  открыть Ubuntu и запустить `./vendor/bin/sail up -d`. Проверка в
+  Ubuntu (не в PowerShell): `wslinfo --networking-mode` → `mirrored`.
+  Откат — удалить строку `networkingMode=mirrored` и снова
+  `wsl --shutdown`.
 - Расширение Claude в Chrome продолжает работать: адрес `http://localhost`
   тот же.
