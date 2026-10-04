@@ -12,7 +12,7 @@ function itemLabels(): array
 }
 
 it('hides items whose route does not exist and drops empty groups', function () {
-    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты']);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие контрагенты']);
     expect(Navigation::groups())->toHaveCount(3);
 });
 
@@ -22,7 +22,7 @@ it('shows a group once one of its routes exists', function () {
 
     $groups = Navigation::groups();
 
-    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Задачи']);
+    expect(itemLabels())->toBe(['Главная', 'Клиенты', 'Контрагенты', 'Действующие контрагенты', 'Задачи']);
     expect($groups[3]['label'])->toBe('Работа');
 });
 
@@ -54,4 +54,5 @@ it('leads the back arrow to the parent section', function (string $uri, ?string 
     'create goes to list' => ['/clients/create', '/clients'],
     'card goes to list' => ['/clients/5', '/clients'],
     'users goes home' => ['/users', '/'],
+    'counterparty list goes to the kanban' => ['/counterparties/list', '/counterparties'],
 ]);

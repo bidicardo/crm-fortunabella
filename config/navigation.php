@@ -22,7 +22,7 @@ return [
             'label' => 'Партнёры',
             'items' => [
                 // Шаблоны не пересекаются: «Действующие» вынесены из «Контрагентов» явным перечнем.
-                ['label' => 'Контрагенты', 'route' => 'counterparties.index', 'icon' => 'counterparties', 'active' => ['counterparties.index', 'counterparties.create', 'counterparties.show'], 'tab' => false],
+                ['label' => 'Контрагенты', 'route' => 'counterparties.index', 'icon' => 'counterparties', 'active' => ['counterparties.index', 'counterparties.list', 'counterparties.create', 'counterparties.show'], 'tab' => false],
                 ['label' => 'Действующие контрагенты', 'route' => 'counterparties.active', 'icon' => 'counterparties', 'active' => ['counterparties.active', 'counterparties.active.*'], 'tab' => false],
             ],
         ],

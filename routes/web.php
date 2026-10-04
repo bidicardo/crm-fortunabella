@@ -10,6 +10,7 @@ use App\Livewire\ClientTable;
 use App\Livewire\CounterpartyBoard;
 use App\Livewire\CounterpartyForm;
 use App\Livewire\CounterpartyShow;
+use App\Livewire\CounterpartyTable;
 use App\Livewire\Home;
 use App\Livewire\Login;
 use App\Livewire\Users;
@@ -36,6 +37,9 @@ Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     Route::livewire('/clients/{client}', ClientShow::class)->name('clients.show');
     Route::livewire('/clients/{client}/merge', ClientMerge::class)->name('clients.merge');
     Route::livewire('/counterparties', CounterpartyBoard::class)->name('counterparties.index');
+    // База и действующие — один компонент; active из defaults маршрута попадает в mount().
+    Route::livewire('/counterparties/list', CounterpartyTable::class)->name('counterparties.list');
+    Route::livewire('/counterparties/active', CounterpartyTable::class)->defaults('active', true)->name('counterparties.active');
     // {counterparty} — только число: не перехватывает /counterparties/active и другие адреса раздела.
     Route::livewire('/counterparties/create', CounterpartyForm::class)->name('counterparties.create');
     Route::livewire('/counterparties/{counterparty}', CounterpartyShow::class)->whereNumber('counterparty')->name('counterparties.show');
