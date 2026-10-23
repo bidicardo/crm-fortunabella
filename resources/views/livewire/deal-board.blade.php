@@ -44,7 +44,9 @@
          перенос. От sm — отдельные карточки. --}}
     <section aria-label="Сводка по сделкам" class="grid shrink-0 grid-cols-4 divide-x divide-line overflow-hidden rounded-lg border border-line sm:gap-3 sm:divide-x-0 sm:overflow-visible sm:rounded-none sm:border-0">
         @foreach ($tiles as $tile)
-            <div class="min-w-0 bg-surface px-2 py-2 sm:rounded-lg sm:border sm:border-line sm:p-4">
+            {{-- Плитка — лёгкий фон и рамка цвета её значка (на телефоне рамки нет — плитки разделены линиями) --}}
+            <div class="min-w-0 bg-surface px-2 py-2 sm:rounded-lg sm:border sm:border-line sm:p-4"
+                style="background-color: color-mix(in srgb, var(--color-{{ $tile['tone'] }}) 7%, var(--color-surface)); border-color: color-mix(in srgb, var(--color-{{ $tile['tone'] }}) 35%, var(--color-line));">
                 <div class="flex items-start justify-between gap-2">
                     <p class="text-caption leading-tight text-ink-secondary max-sm:text-[0.6875rem]"><span class="sm:hidden">{{ $tile['short'] }}</span><span class="max-sm:hidden">{{ $tile['label'] }}</span></p>
                     <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-sm:hidden"
@@ -57,13 +59,16 @@
             </div>
         @endforeach
 
-        {{-- «Предоплата не получена» — сигнал: если есть брони без оплаты, плитка подсвечена цветом ошибки --}}
+        {{-- «Предоплата не получена» — сигнал: есть брони без оплаты — цвет ошибки, иначе — оранжевый, как значок --}}
+        @php
+            $unpaidTone = $unpaid > 0 ? 'error' : 'stage-done';
+        @endphp
         <div class="min-w-0 bg-surface px-2 py-2 sm:rounded-lg sm:border sm:border-line sm:p-4"
-            @if ($unpaid > 0) style="background-color: color-mix(in srgb, var(--color-error) 7%, var(--color-surface)); border-color: color-mix(in srgb, var(--color-error) 35%, var(--color-line));" @endif>
+            style="background-color: color-mix(in srgb, var(--color-{{ $unpaidTone }}) 7%, var(--color-surface)); border-color: color-mix(in srgb, var(--color-{{ $unpaidTone }}) 35%, var(--color-line));">
             <div class="flex items-start justify-between gap-2">
                 <p class="text-caption leading-tight text-ink-secondary max-sm:text-[0.6875rem]"><span class="sm:hidden">Без предоплаты</span><span class="max-sm:hidden">Предоплата не получена</span></p>
                 <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md max-sm:hidden"
-                    style="color: var(--color-{{ $unpaid > 0 ? 'error' : 'stage-done' }}); background-color: color-mix(in srgb, var(--color-{{ $unpaid > 0 ? 'error' : 'stage-done' }}) 12%, var(--color-surface));">
+                    style="color: var(--color-{{ $unpaidTone }}); background-color: color-mix(in srgb, var(--color-{{ $unpaidTone }}) 12%, var(--color-surface));">
                     <x-icon name="warning" class="h-4 w-4" />
                 </span>
             </div>
