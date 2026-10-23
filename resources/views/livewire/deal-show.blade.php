@@ -193,6 +193,15 @@
                         @endforeach
                     </ol>
                 </div>
+                @if ($bookingWarning)
+                    {{-- Переход в «Бронь» без оплаченной предоплаты (задача 30): предупреждение, переход уже выполнен --}}
+                    <x-ui.alert kind="warning" class="mt-3">
+                        <div class="flex items-start gap-2">
+                            <p class="min-w-0 flex-1 break-words">{{ $bookingWarning }}</p>
+                            <x-ui.icon-button icon="close" label="Закрыть предупреждение" class="-my-2 -mr-2" wire:click="$set('bookingWarning', '')" />
+                        </div>
+                    </x-ui.alert>
+                @endif
             </x-ui.card>
 
             <x-ui.card class="min-w-0">

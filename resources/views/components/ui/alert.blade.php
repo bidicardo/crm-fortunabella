@@ -22,7 +22,7 @@
 >
     <x-icon :name="$icon" class="h-5 w-5 shrink-0" style="color: {{ $color }}" />
 
-    <div class="min-w-0 space-y-1">
+    <div class="min-w-0 flex-1 space-y-1">
         @if ($title)
             <p class="text-h4 font-semibold" style="color: {{ $color }}">{{ $title }}</p>
         @endif

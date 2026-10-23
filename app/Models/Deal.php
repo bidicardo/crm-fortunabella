@@ -112,6 +112,14 @@ class Deal extends Model
         return $this->belongsTo(User::class, 'prepayment_holder_id');
     }
 
+    /** Предупреждение после перехода в «Бронь» без оплаченной предоплаты (docs/05); переход не блокируется. */
+    public function bookingWarning(): ?string
+    {
+        return $this->stage === DealStage::Booked && ! $this->prepayment_paid
+            ? "«{$this->title}» — в «Брони», но предоплата не получена."
+            : null;
+    }
+
     /** Смена этапа (из любого в любой); без позиции — в конец колонки. */
     public function moveTo(DealStage $stage, ?int $position = null): void
     {

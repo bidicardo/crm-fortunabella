@@ -37,6 +37,9 @@ class DealShow extends Component
 
     public bool $editingTableTypes = false;
 
+    /** Предупреждение после перехода в «Бронь» без предоплаты — у линии этапов, закрывается. */
+    public string $bookingWarning = '';
+
     protected function editableModel(): Model
     {
         return $this->deal;
@@ -67,6 +70,7 @@ class DealShow extends Component
 
         if ($stage !== $this->deal->stage) {
             $this->deal->moveTo($stage);
+            $this->bookingWarning = $this->deal->bookingWarning() ?? '';
         }
     }
 

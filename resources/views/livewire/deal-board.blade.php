@@ -39,6 +39,16 @@
         <x-ui.alert kind="success">{{ session('status') }}</x-ui.alert>
     @endif
 
+    @if ($bookingWarning)
+        {{-- Переход в «Бронь» без оплаченной предоплаты (задача 30): предупреждение, переход уже выполнен --}}
+        <x-ui.alert kind="warning" class="shrink-0">
+            <div class="flex items-start gap-2">
+                <p class="min-w-0 flex-1 break-words">{{ $bookingWarning }}</p>
+                <x-ui.icon-button icon="close" label="Закрыть предупреждение" class="-my-2 -mr-2" wire:click="$set('bookingWarning', '')" />
+            </div>
+        </x-ui.alert>
+    @endif
+
     {{-- Мини-аналитика: 4 плитки в ряд всегда. На телефоне — одна полоса без промежутков (плитки разделены линиями),
          короткие подписи и суммы мелким шрифтом, без иконок и пояснений; сумма не обрезается, при нехватке места —
          перенос. От sm — отдельные карточки. --}}

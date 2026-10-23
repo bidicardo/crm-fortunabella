@@ -19,6 +19,9 @@ trait MovesKanbanCards
     /** @return class-string<BackedEnum> */
     abstract protected function kanbanStages(): string;
 
+    /** Вызывается после смены этапа карточки (любым способом); канбан сделок предупреждает о «Брони» без предоплаты. */
+    protected function cardMoved(Model $card): void {}
+
     private function kanbanStage(mixed $stage): BackedEnum
     {
         return $this->kanbanStages()::tryFrom((string) $stage) ?? abort(404);
@@ -36,10 +39,13 @@ trait MovesKanbanCards
         if ($this->sort !== 'manual') {
             if ($stage !== $card->stage) {
                 $card->moveTo($stage);
+                $this->cardMoved($card);
             }
 
             return;
         }
+
+        $changed = $stage !== $card->stage;
 
         $ids = $model::stage($stage)->whereKeyNot($card->id)->orderBy('position')->orderBy('id')->pluck('id')->all();
         $position = max(0, min((int) $position, count($ids)));
@@ -55,6 +61,10 @@ trait MovesKanbanCards
             $bindings = collect($ids)->flatMap(fn ($id, $i) => [$id, $i])->merge($ids)->all();
             DB::update("update {$card->getTable()} set position = case id {$cases}end where id in ($in)", $bindings);
         });
+
+        if ($changed) {
+            $this->cardMoved($card);
+        }
     }
 
     /**
@@ -73,6 +83,7 @@ trait MovesKanbanCards
                 $model::stage($stage)->toBase()->increment('position');
                 $card->moveTo($stage, 0);
             });
+            $this->cardMoved($card);
         }
     }
 }

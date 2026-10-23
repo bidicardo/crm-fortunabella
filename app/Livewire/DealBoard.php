@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Enums\DealStage;
 use App\Livewire\Concerns\MovesKanbanCards;
 use App\Models\Deal;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -24,6 +25,9 @@ class DealBoard extends Component
     #[Url(except: 'manual')]
     public string $sort = 'manual';
 
+    /** Предупреждение после перехода в «Бронь» без предоплаты — вверху канбана, закрывается. */
+    public string $bookingWarning = '';
+
     public function updatedSort(): void
     {
         if (! in_array($this->sort, self::SORTS, true)) {
@@ -39,6 +43,11 @@ class DealBoard extends Component
     protected function kanbanStages(): string
     {
         return DealStage::class;
+    }
+
+    protected function cardMoved(Model $card): void
+    {
+        $this->bookingWarning = $card->bookingWarning() ?? '';
     }
 
     /**
