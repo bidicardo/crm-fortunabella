@@ -32,11 +32,22 @@
                         @case ('updated')
                             <ul class="space-y-0.5">
                                 @foreach ($log->changes ?? [] as $field => $change)
+                                    @php
+                                        // Подпись, сохранённая при записи (имя удалённого клиента не теряется), иначе — по текущим данным.
+                                        $values = [];
+                                        foreach (['old', 'new'] as $side) {
+                                            $values[$side] = [
+                                                'text' => $change[$side.'_label'] ?? $subject->activityValue($field, $change[$side] ?? null),
+                                                'url' => $subject->activityLink($field, $change[$side] ?? null),
+                                            ];
+                                        }
+                                    @endphp
                                     <li class="break-words">
                                         {{ $subject->activityLabel($field) }}:
-                                        <span class="text-ink-secondary">{{ $subject->activityValue($field, $change['old'] ?? null) ?? '—' }}</span>
-                                        →
-                                        <span class="whitespace-pre-line">{{ $subject->activityValue($field, $change['new'] ?? null) ?? '—' }}</span>
+                                        @foreach (['old' => 'text-ink-secondary', 'new' => 'whitespace-pre-line'] as $side => $class)
+                                            @if ($side === 'new') → @endif
+                                            <span class="{{ $class }}">@if ($values[$side]['url'] && $values[$side]['text'])<a href="{{ $values[$side]['url'] }}" class="focus-ring link">{{ $values[$side]['text'] }}</a>@else{{ $values[$side]['text'] ?? '—' }}@endif</span>
+                                        @endforeach
                                     </li>
                                 @endforeach
                             </ul>

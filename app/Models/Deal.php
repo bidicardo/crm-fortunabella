@@ -256,6 +256,44 @@ class Deal extends Model
         ];
     }
 
+    /**
+     * Имена связанных записей и источник «Другое: …» сохраняются подписью в момент записи: в ленте они остаются,
+     * даже если клиента, контрагента или пользователя потом удалят.
+     */
+    public function activityChange(string $field, mixed $old, mixed $new): array
+    {
+        $change = ['old' => $old, 'new' => $new];
+
+        if (in_array($field, ['client_id', 'counterparty_id', 'sold_by_id', 'prepayment_holder_id'], true)) {
+            $change['old_label'] = $this->activityValue($field, $old);
+            $change['new_label'] = $this->activityValue($field, $new);
+        }
+
+        if ($field === 'lead_source') {
+            $source = fn (mixed $value, ?string $other) => $value === LeadSource::Other->value && filled($other)
+                ? 'Другое: '.$other
+                : $this->activityValue($field, $value);
+            $change['old_label'] = $source($old, $this->getRawOriginal('lead_source_other'));
+            $change['new_label'] = $source($new, $this->lead_source_other);
+        }
+
+        return $change;
+    }
+
+    /** Клиент и контрагент в ленте — ссылкой на карточку, пока они существуют. */
+    public function activityLink(string $field, mixed $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        return match ($field) {
+            'client_id' => once(fn () => Client::whereKey($value)->exists()) ? route('clients.show', $value) : null,
+            'counterparty_id' => once(fn () => Counterparty::whereKey($value)->exists()) ? route('counterparties.show', $value) : null,
+            default => null,
+        };
+    }
+
     // Порядок карточки в колонке канбана — служебный, в историю не пишется.
     public function activityIgnored(): array
     {
