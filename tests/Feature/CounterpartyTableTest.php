@@ -1,9 +1,11 @@
 <?php
 
 use App\Livewire\CounterpartyBoard;
+use App\Livewire\CounterpartyShow;
 use App\Livewire\CounterpartyTable;
 use App\Models\Counterparty;
 use App\Models\CounterpartyContact;
+use App\Models\Deal;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
@@ -182,4 +184,23 @@ it('does not run more queries for more counterparties', function () {
     Counterparty::factory()->count(10)->has(CounterpartyContact::factory()->count(2), 'contacts')->create();
 
     expect($count())->toBe($few);
+});
+
+it('counts done deals per counterparty in the list and on the card; the number is not editable', function () {
+    $busy = Counterparty::factory()->cooperating()->create(['name' => 'Ресторан Уют']);
+    Deal::factory()->count(2)->done()->for($busy)->create();
+    Deal::factory()->booked()->for($busy)->create();
+    $quiet = Counterparty::factory()->cooperating()->create(['name' => 'Тамада']);
+
+    $list = Livewire::test(CounterpartyTable::class)->call('sortBy', 'done_deals_count')->call('sortBy', 'done_deals_count');
+    expect(tableNames($list))->toBe(['Ресторан Уют', 'Тамада'])
+        ->and($list->viewData('counterparties')->pluck('done_deals_count')->all())->toBe([2, 0]);
+    $list->assertSeeHtml('x-show="cols.done_deals_count"');
+
+    Livewire::test(CounterpartyTable::class, ['active' => true])->assertSee('Проведено сделок');
+
+    Livewire::test(CounterpartyShow::class, ['counterparty' => $busy])
+        ->assertSeeInOrder(['Проведено сделок', '2'])
+        ->call('edit', 'done_deals_count')->assertNotFound();
+    Livewire::test(CounterpartyShow::class, ['counterparty' => $quiet])->assertSeeInOrder(['Проведено сделок', '0']);
 });

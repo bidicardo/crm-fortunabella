@@ -64,13 +64,14 @@ class DealTable extends Component
         $this->resetPage();
     }
 
-    public function render()
+    /** Запрос списка с фильтрами и сортировкой — для таблицы и для «выбрать всё на странице». */
+    protected function listQuery(): Builder
     {
         $term = trim($this->search);
         $sort = in_array($this->sort, self::SORTABLE, true) ? $this->sort : 'created_at';
         $dir = $this->dir === 'asc' ? 'asc' : 'desc';
 
-        $deals = Deal::query()
+        return Deal::query()
             ->with(['client:id,name', 'counterparty:id,name', 'soldBy:id,name'])
             ->when(DealStage::tryFrom($this->stage), fn (Builder $q, DealStage $stage) => $q->stage($stage))
             ->when(LeadSource::tryFrom($this->source), fn (Builder $q, LeadSource $source) => $q->where('lead_source', $source))
@@ -79,8 +80,12 @@ class DealTable extends Component
             ->when(in_array($sort, ['event_date', 'amount'], true), fn (Builder $q) => $q->orderByRaw("$sort is null"))
             ->orderBy($sort, $dir)
             ->when($sort === 'event_date', fn (Builder $q) => $q->orderBy('event_time', $dir))
-            ->orderBy('id', $dir)
-            ->paginate(25);
+            ->orderBy('id', $dir);
+    }
+
+    public function render()
+    {
+        $deals = $this->listQuery()->paginate(25);
 
         return view('livewire.deal-table', [
             'deals' => $deals,

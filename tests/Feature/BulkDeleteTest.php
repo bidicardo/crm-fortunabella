@@ -46,18 +46,19 @@ it('deletes a client together with its merged duplicates; archived ones are not 
 it('selects all rows of the page and deselects them on the second click', function () {
     $ids = Client::factory()->count(3)->create()->pluck('id')->map(fn ($id) => (string) $id)->all();
 
-    $list = Livewire::test(ClientTable::class)->assertSeeHtml('id="select-page"')
-        ->call('togglePage', $ids)->assertSet('selected', $ids);
+    // Главный флажок — вызов без параметров: id страницы сервер берёт сам (список из разметки в браузере не доходил).
+    $list = Livewire::test(ClientTable::class)->assertSeeHtml('id="select-page"')->assertSeeHtml('wire:click="togglePage"')
+        ->call('togglePage');
+    expect($list->get('selected'))->toEqualCanonicalizing($ids);
 
     // Флажки строк отмечены и в разметке: иначе обновление страницы после ответа сервера снимает отметку.
     foreach ($ids as $id) {
         expect($list->html())->toMatch('/<input[^>]*id="select-'.$id.'"[^>]*checked/s');
     }
 
-    $list
-        ->call('togglePage', $ids)->assertSet('selected', []);
+    $list->call('togglePage')->assertSet('selected', []);
 
-    $list->set('selected', [$ids[0]])->call('togglePage', $ids);
+    $list->set('selected', [$ids[0]])->call('togglePage');
     expect($list->get('selected'))->toEqualCanonicalizing($ids);
 
     $list->call('clearSelection')->assertSet('selected', []);

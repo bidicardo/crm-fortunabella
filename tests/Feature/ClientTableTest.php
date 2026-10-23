@@ -123,7 +123,8 @@ it('marks clients with deals and filters by deals', function () {
     Deal::factory()->count(2)->for($withDeals)->create();
     Client::factory()->create(['name' => 'Без сделок']);
 
-    Livewire::test(ClientTable::class)->assertSee('2 сделки');
+    // Фильтр — в шапке колонки «Имя», на всех ширинах.
+    Livewire::test(ClientTable::class)->assertSee('2 сделки')->assertSeeHtml('aria-label="Фильтр по сделкам"');
     expect(names(Livewire::test(ClientTable::class)->set('deals', 'with')))->toBe(['Со сделками'])
         ->and(names(Livewire::test(ClientTable::class)->set('deals', 'without')))->toBe(['Без сделок'])
         ->and(Livewire::test(ClientTable::class)->set('deals', 'nonsense')->viewData('clients')->count())->toBe(2);

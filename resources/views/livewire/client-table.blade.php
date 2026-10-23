@@ -57,15 +57,6 @@
                 </x-ui.select>
             </div>
 
-            {{-- Фильтр по сделкам — от sm (на телефоне панель не поместилась бы в две строки) --}}
-            <div class="min-w-0 max-sm:hidden sm:flex-initial">
-                <x-ui.select wire:model.live="deals" aria-label="Сделки">
-                    <option value="">Все клиенты</option>
-                    <option value="with">Со сделками</option>
-                    <option value="without">Без сделок</option>
-                </x-ui.select>
-            </div>
-
             <div class="relative shrink-0" x-on:keydown.escape.window="open = false" x-on:click.outside="open = false">
                 <x-ui.button variant="secondary" x-ref="columnsButton" aria-haspopup="true" x-bind:aria-expanded="open" x-on:click="open = !open">Колонки</x-ui.button>
 
@@ -94,7 +85,7 @@
                 @if (! $onlyArchived)
                     @php($pageIds = $clients->pluck('id')->map(fn ($id) => (string) $id)->all())
                     <th class="w-10 pl-3">
-                        <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage(@js($pageIds))"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
+                        <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
                     </th>
                 @endif
                 @foreach (['name' => 'Имя'] + $columns as $key => $label)
@@ -112,6 +103,16 @@
                             </button>
                         @else
                             {{ $label }}
+                        @endif
+                        {{-- Фильтр по сделкам — прямо в шапке колонки «Имя» (место экономится и на телефоне) --}}
+                        @if ($key === 'name')
+                            <div class="ml-2 inline-block w-36 align-middle font-normal">
+                                <x-ui.select compact wire:model.live="deals" aria-label="Фильтр по сделкам">
+                                    <option value="">Все клиенты</option>
+                                    <option value="with">Со сделками</option>
+                                    <option value="without">Без сделок</option>
+                                </x-ui.select>
+                            </div>
                         @endif
                     </th>
                 @endforeach

@@ -7,10 +7,11 @@
         'email' => 'Email',
         'contact' => 'Основной контакт',
         'cooperation_started_at' => 'Начало сотрудничества',
+        'done_deals_count' => 'Проведено сделок',
         'created_at' => 'Создан',
         'updated_at' => 'Изменён',
     ]);
-    $sortable = ['name', 'cooperation_started_at', 'created_at', 'updated_at'];
+    $sortable = ['name', 'cooperation_started_at', 'done_deals_count', 'created_at', 'updated_at'];
     $storageKey = $active ? 'counterparties.active.columns' : 'counterparties.columns';
 @endphp
 
@@ -21,7 +22,7 @@
     class="flex h-main flex-col gap-4"
     x-data="{
         cols: (() => {
-            const defaults = { type: true, stage: true, phone: true, email: true, contact: true, cooperation_started_at: true, created_at: true, updated_at: false };
+            const defaults = { type: true, stage: true, phone: true, email: true, contact: true, cooperation_started_at: true, done_deals_count: true, created_at: true, updated_at: false };
             try { return { ...defaults, ...JSON.parse(localStorage.getItem('{{ $storageKey }}') || '{}') }; } catch (e) { return defaults; }
         })(),
         open: false,
@@ -90,7 +91,7 @@
             <tr>
                 @php($pageIds = $counterparties->pluck('id')->map(fn ($id) => (string) $id)->all())
                 <th class="w-10 pl-3">
-                    <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage(@js($pageIds))"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
+                    <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
                 </th>
                 @foreach (['name' => 'Название'] + $columns as $key => $label)
                     <th
@@ -132,6 +133,7 @@
                     <td class="px-4 py-2" x-show="cols.email">{{ $counterparty->email }}</td>
                     <td class="px-4 py-2" x-show="cols.contact">{{ $counterparty->contacts->first()?->full_name }}</td>
                     <td class="whitespace-nowrap px-4 py-2" x-show="cols.cooperation_started_at">{{ $counterparty->cooperation_started_at?->format('d.m.Y') }}</td>
+                    <td class="whitespace-nowrap px-4 py-2 tabular-nums" x-show="cols.done_deals_count">{{ $counterparty->done_deals_count }}</td>
                     <td class="whitespace-nowrap px-4 py-2" x-show="cols.created_at">{{ $counterparty->created_at->format('d.m.Y') }}</td>
                     <td class="whitespace-nowrap px-4 py-2" x-show="cols.updated_at">{{ $counterparty->updated_at->format('d.m.Y') }}</td>
                 </tr>

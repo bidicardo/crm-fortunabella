@@ -94,7 +94,7 @@
             <tr>
                 @php($pageIds = $deals->pluck('id')->map(fn ($id) => (string) $id)->all())
                 <th class="w-10 pl-3">
-                    <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage(@js($pageIds))"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
+                    <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
                 </th>
                 @foreach (['title' => 'Название'] + $columns as $key => $label)
                     <th

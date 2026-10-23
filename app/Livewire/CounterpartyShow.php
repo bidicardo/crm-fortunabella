@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\CounterpartyStage;
+use App\Enums\DealStage;
 use App\Livewire\Concerns\EditsFieldsInline;
 use App\Livewire\Concerns\WithActivityHistory;
 use App\Models\Counterparty;
@@ -97,6 +98,8 @@ class CounterpartyShow extends Component
             ...$this->historyData($this->counterparty),
             'contacts' => $this->counterparty->contacts()->get(),
             'deals' => $this->counterparty->deals()->latest('id')->get(),
+            // Проведённые сделки — только по сделкам, вручную не правятся.
+            'doneDeals' => $this->counterparty->deals()->where('stage', DealStage::Done)->count(),
             'stages' => CounterpartyStage::cases(),
         ])->title('Контрагент');
     }

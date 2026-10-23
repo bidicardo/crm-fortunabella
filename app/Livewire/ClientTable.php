@@ -74,13 +74,14 @@ class ClientTable extends Component
         $this->resetPage();
     }
 
-    public function render()
+    /** Запрос списка с фильтрами и сортировкой — для таблицы и для «выбрать всё на странице». */
+    protected function listQuery(): Builder
     {
         $term = trim($this->search);
         $sort = in_array($this->sort, self::SORTABLE, true) ? $this->sort : 'created_at';
         $dir = $this->dir === 'asc' ? 'asc' : 'desc';
 
-        $clients = Client::query()
+        return Client::query()
             // Число сделок — для метки у имени (одним подзапросом, без N+1).
             ->withCount('deals')
             ->when($this->deals === 'with', fn (Builder $q) => $q->has('deals'))
@@ -89,8 +90,12 @@ class ClientTable extends Component
             ->when(ClientLegalType::tryFrom($this->legalType), fn (Builder $q, ClientLegalType $type) => $q->where('legal_type', $type))
             ->when($term !== '', fn (Builder $q) => $q->search($term))
             ->orderBy($sort, $dir)
-            ->orderBy('id', $dir)
-            ->paginate(25);
+            ->orderBy('id', $dir);
+    }
+
+    public function render()
+    {
+        $clients = $this->listQuery()->paginate(25);
 
         return view('livewire.client-table', [
             'clients' => $clients,

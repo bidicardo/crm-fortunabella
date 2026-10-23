@@ -22,10 +22,22 @@ trait DeletesSelected
     /** Какие записи этого списка можно удалять (например, клиенты — только не архивные). */
     abstract protected function deletableQuery(): Builder;
 
-    /** Отметить все строки страницы или, если все уже отмечены, снять с них отметку. */
-    public function togglePage(array $ids): void
+    /** Запрос списка с фильтрами и сортировкой (тот же, что строит таблицу). */
+    abstract protected function listQuery(): Builder;
+
+    /** id строк текущей страницы — строками, как в $selected. */
+    protected function pageIds(): array
     {
-        $ids = array_values(array_unique(array_map(fn ($id) => (string) (int) $id, $ids)));
+        return $this->listQuery()->paginate(25)->pluck('id')->map(fn ($id) => (string) $id)->all();
+    }
+
+    /**
+     * Отметить все строки страницы или, если все уже отмечены, снять с них отметку. id страницы сервер берёт сам
+     * (тем же запросом, что таблица), а не из браузера: передача списка в wire:click в браузере не срабатывала.
+     */
+    public function togglePage(): void
+    {
+        $ids = $this->pageIds();
         $selected = array_map('strval', $this->selected);
 
         $this->selected = array_diff($ids, $selected) === []

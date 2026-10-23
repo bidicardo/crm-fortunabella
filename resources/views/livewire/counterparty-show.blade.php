@@ -113,6 +113,7 @@
                 <dl class="grid gap-4">
                     <x-ui.field label="Создан">{{ $counterparty->created_at->format('d.m.Y H:i') }}</x-ui.field>
                     <x-ui.field label="Изменён">{{ $counterparty->updated_at->format('d.m.Y H:i') }}</x-ui.field>
+                    <x-ui.field label="Проведено сделок">{{ $doneDeals }}</x-ui.field>
                 </dl>
             </x-ui.card>
 
