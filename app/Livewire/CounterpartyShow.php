@@ -96,6 +96,7 @@ class CounterpartyShow extends Component
         return view('livewire.counterparty-show', [
             ...$this->historyData($this->counterparty),
             'contacts' => $this->counterparty->contacts()->get(),
+            'deals' => $this->counterparty->deals()->latest('id')->get(),
             'stages' => CounterpartyStage::cases(),
         ])->title('Контрагент');
     }

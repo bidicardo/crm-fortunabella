@@ -5,11 +5,12 @@ namespace App\Services;
 use App\Models\ActivityLog;
 use App\Models\Client;
 use App\Models\Counterparty;
+use App\Models\Deal;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Окончательное удаление клиента или контрагента (решение владельца: любой пользователь, после
+ * Окончательное удаление клиента, контрагента или сделки (решение владельца: любой пользователь, после
  * подтверждения, без корзины). Вместе с записью удаляются её история, у клиента — влитые в него
  * архивные дубли (с их историей), у контрагента — контактные лица (каскад в БД).
  */
@@ -35,10 +36,10 @@ class RecordDeleter
     }
 
     /** @throws DomainException если у записи есть сделки — тогда ничего не удаляется */
-    public function delete(Client|Counterparty $record): void
+    public function delete(Client|Counterparty|Deal $record): void
     {
         DB::transaction(function () use ($record) {
-            $deals = $this->dealsCount($record);
+            $deals = $record instanceof Deal ? 0 : $this->dealsCount($record);
 
             if ($deals > 0) {
                 throw new DomainException("Сначала удалите или перенесите сделки: $deals.");

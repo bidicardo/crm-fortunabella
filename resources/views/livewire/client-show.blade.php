@@ -88,6 +88,11 @@
                     <x-ui.editable-field label="Примечания" field="notes" type="textarea" :editing="$editing === 'notes'" :readonly="$archived">{{ $client->notes }}</x-ui.editable-field>
                 </dl>
             </x-ui.card>
+
+            {{-- У архивного дубля сделок нет: при слиянии они переходят к основному клиенту. --}}
+            @unless ($archived)
+                @include('livewire.deals.related-deals', ['deals' => $deals, 'createUrl' => route('deals.create', ['client' => $client->id])])
+            @endunless
         </div>
 
         <div class="min-w-0 space-y-4">

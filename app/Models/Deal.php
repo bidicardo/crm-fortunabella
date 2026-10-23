@@ -9,6 +9,7 @@ use App\Models\Concerns\LogsActivity;
 use Database\Factories\DealFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,6 +53,12 @@ class Deal extends Model
             'guests' => 'integer',
             'prepayment_paid' => 'boolean',
         ];
+    }
+
+    // Время — «ЧЧ:ММ» без секунд (MySQL отдаёт 18:00:00): так оно показывается и проходит проверку H:i при правке.
+    protected function eventTime(): Attribute
+    {
+        return Attribute::get(fn (?string $value) => $value === null ? null : substr($value, 0, 5));
     }
 
     /** Правила проверки полей: общие для формы создания и правки поля в карточке. Обязательны название и клиент. */

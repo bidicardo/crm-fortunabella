@@ -60,6 +60,7 @@ class ClientShow extends Component
             ...$this->historyData($this->client),
             'duplicatesCount' => $this->client->isArchived() ? 0 : count(app(RecordDeleter::class)->duplicateIds($this->client)),
             'legalTypes' => ClientLegalType::cases(),
+            'deals' => $this->client->deals()->latest('id')->get(),
         ])->title('Клиент');
     }
 }

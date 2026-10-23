@@ -11,6 +11,8 @@ use App\Livewire\CounterpartyBoard;
 use App\Livewire\CounterpartyForm;
 use App\Livewire\CounterpartyShow;
 use App\Livewire\CounterpartyTable;
+use App\Livewire\DealForm;
+use App\Livewire\DealShow;
 use App\Livewire\Home;
 use App\Livewire\Login;
 use App\Livewire\Users;
@@ -43,6 +45,9 @@ Route::middleware(['auth', EnsureUserIsNotBlocked::class])->group(function () {
     // {counterparty} — только число: не перехватывает /counterparties/active и другие адреса раздела.
     Route::livewire('/counterparties/create', CounterpartyForm::class)->name('counterparties.create');
     Route::livewire('/counterparties/{counterparty}', CounterpartyShow::class)->whereNumber('counterparty')->name('counterparties.show');
+    // Канбан (deals.index) и список (deals.list) — задачи 28, 28а; {deal} — только число.
+    Route::livewire('/deals/create', DealForm::class)->name('deals.create');
+    Route::livewire('/deals/{deal}', DealShow::class)->whereNumber('deal')->name('deals.show');
     Route::livewire('/users', Users::class)->middleware('can:manage-users')->name('users');
     Route::post('/logout', LogoutController::class)->name('logout');
 });
