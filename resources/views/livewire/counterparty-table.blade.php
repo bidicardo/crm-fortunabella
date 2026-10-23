@@ -32,6 +32,8 @@
         <x-ui.alert kind="success">{{ session('status') }}</x-ui.alert>
     @endif
 
+    @include('livewire.partials.bulk-bar', ['confirm' => 'Удалить выбранных контрагентов вместе с контактными лицами'])
+
     {{-- Телефон — две строки: [вид | поиск] и [этап, «Колонки», «+ Новый»]; от sm — всё в одну строку. --}}
     <div class="flex flex-wrap items-center gap-3">
         <div class="flex w-full items-center gap-3 sm:w-auto">
@@ -86,6 +88,10 @@
     <x-ui.table class="min-h-0 flex-1 overflow-y-auto" wire:key="counterparties-{{ $counterparties->currentPage() }}-{{ $sort }}-{{ $dir }}">
         <thead class="sticky top-0 z-10 bg-surface">
             <tr>
+                @php($pageIds = $counterparties->pluck('id')->map(fn ($id) => (string) $id)->all())
+                <th class="w-10 pl-3">
+                    <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage(@js($pageIds))"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
+                </th>
                 @foreach (['name' => 'Название'] + $columns as $key => $label)
                     <th
                         class="whitespace-nowrap px-4 py-2 text-caption font-semibold"
@@ -109,6 +115,9 @@
         <tbody>
             @forelse ($counterparties as $counterparty)
                 <tr wire:key="counterparty-{{ $counterparty->id }}" class="border-t border-line">
+                    <td class="w-10 pl-3">
+                        <x-ui.checkbox id="select-{{ $counterparty->id }}" value="{{ $counterparty->id }}" :checked="in_array((string) $counterparty->id, $selected, true)" wire:model.live="selected"><span class="sr-only">Выбрать {{ $counterparty->name }}</span></x-ui.checkbox>
+                    </td>
                     {{-- Название в одну строку не шире max-w-64, длиннее — многоточие; полностью — подсказкой --}}
                     <td class="px-4 py-2">
                         <a href="{{ route('counterparties.show', $counterparty) }}" title="{{ $counterparty->name }}" class="focus-ring link block max-w-64 truncate font-medium">{{ $counterparty->name }}</a>
@@ -128,7 +137,7 @@
                 </tr>
             @empty
                 <tr class="border-t border-line">
-                    <td colspan="{{ count($columns) + 1 }}">
+                    <td colspan="{{ count($columns) + 2 }}">
                         <x-ui.empty-state icon="search" title="Контрагентов не найдено" />
                     </td>
                 </tr>

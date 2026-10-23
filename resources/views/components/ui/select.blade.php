@@ -5,6 +5,8 @@
     'error' => null,
     // Цвет этапа (stage-new, stage-inwork…): текст и рамка этого цвета, фон — слабый оттенок (8 %: контраст текста AA в обеих темах)
     'tone' => null,
+    // Компактный (карточки канбана): меньше отступы и шрифт на ПК; на телефоне шрифт полей и так 16 px (app.css).
+    'compact' => false,
 ])
 
 @php
@@ -12,7 +14,8 @@
     $key = $name ?? $id;
     $error ??= ($key && isset($errors) ? ($errors->first($key) ?: null) : null);
     // Правый отступ под стрелку задаёт общее правило select в app.css.
-    $classes = 'focus-ring w-full rounded-md border bg-surface px-3 py-2 text-body text-ink disabled:cursor-not-allowed disabled:opacity-50 '
+    $classes = 'focus-ring w-full rounded-md border bg-surface text-ink disabled:cursor-not-allowed disabled:opacity-50 '
+        .($compact ? 'px-2 py-1 text-caption ' : 'px-3 py-2 text-body ')
         .($error ? 'border-error' : 'border-line');
     // Цвет этапа приглушается серым на --stage-mute (тёмная тема — 30 %, светлая — 0 %), как линия карточки канбана.
     $color = "color-mix(in srgb, var(--color-{$tone}), var(--color-ink-muted) var(--stage-mute))";

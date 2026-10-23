@@ -3,17 +3,20 @@
 namespace App\Livewire;
 
 use App\Enums\CounterpartyStage;
+use App\Livewire\Concerns\MovesKanbanCards;
 use App\Models\Counterparty;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
 /**
  * Канбан контрагентов (главный вид раздела): колонки — этапы воронки. Перенос — встроенный в Livewire 4
- * wire:sort (обработчик получает id карточки, новую позицию в колонке и id колонки = значение этапа).
+ * wire:sort (обработчик получает id карточки, новую позицию в колонке и id колонки = значение этапа);
+ * логика переноса — трейт MovesKanbanCards (общая с канбаном сделок).
  */
 class CounterpartyBoard extends Component
 {
+    use MovesKanbanCards;
+
     private const SORTS = ['manual', 'name', 'created'];
 
     /** Порядок карточек в колонке: manual — как расставили перетаскиванием (position), name, created. */
@@ -27,54 +30,14 @@ class CounterpartyBoard extends Component
         }
     }
 
-    /** Перенос перетаскиванием: в другой этап и/или на другое место в колонке. */
-    public function moveCard(mixed $id, mixed $position, mixed $stage): void
+    protected function kanbanModel(): string
     {
-        $stage = CounterpartyStage::tryFrom((string) $stage) ?? abort(404);
-        $card = Counterparty::findOrFail((int) $id);
-
-        // При сортировке не «Вручную» порядок задаёт сортировка: внутри колонки ничего не меняем,
-        // в другую колонку — ставим в конец её ручного порядка.
-        if ($this->sort !== 'manual') {
-            if ($stage !== $card->stage) {
-                $card->moveTo($stage);
-            }
-
-            return;
-        }
-
-        $ids = Counterparty::stage($stage)->whereKeyNot($card->id)->orderBy('position')->orderBy('id')->pluck('id')->all();
-        $position = max(0, min((int) $position, count($ids)));
-        array_splice($ids, $position, 0, [$card->id]);
-
-        DB::transaction(function () use ($card, $stage, $position, $ids) {
-            // Смена этапа пишется в историю; position — служебное поле, в историю не попадает.
-            $card->moveTo($stage, $position);
-
-            // Порядок всей колонки — одним запросом: position = номер по порядку.
-            $cases = str_repeat('when ? then ? ', count($ids));
-            $in = implode(',', array_fill(0, count($ids), '?'));
-            $bindings = collect($ids)->flatMap(fn ($id, $i) => [$id, $i])->merge($ids)->all();
-            DB::update("update counterparties set position = case id {$cases}end where id in ($in)", $bindings);
-        });
+        return Counterparty::class;
     }
 
-    /**
-     * Смена этапа без перетаскивания (список на карточке): в начало колонки — позиции колонки сдвигаются
-     * на 1, карточка встаёт на 0 (position беззнаковая, отрицательной быть не может). toBase(): без
-     * updated_at у сдвинутых карточек — position служебное поле.
-     */
-    public function changeStage(mixed $id, mixed $stage): void
+    protected function kanbanStages(): string
     {
-        $stage = CounterpartyStage::tryFrom((string) $stage) ?? abort(404);
-        $card = Counterparty::findOrFail((int) $id);
-
-        if ($stage !== $card->stage) {
-            DB::transaction(function () use ($card, $stage) {
-                Counterparty::stage($stage)->toBase()->increment('position');
-                $card->moveTo($stage, 0);
-            });
-        }
+        return CounterpartyStage::class;
     }
 
     public function render()

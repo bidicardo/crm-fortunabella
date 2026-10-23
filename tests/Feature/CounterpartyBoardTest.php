@@ -40,10 +40,10 @@ it('shows four columns in stage order with counters and the main fields', functi
         ->assertSeeHtml('href="'.route('counterparties.create', ['stage' => 'pushing']).'"')
         ->assertSeeHtml('wire:sort:group-id="pushing"')
         ->assertSeeHtml('wire:sort:item="'.$agency->id.'"')
-        // Цвет этапа (приглушается --stage-mute): линия слева у карточки и окрашенный список этапа (Дожим — stage-booked, Отказ — stage-refused)
-        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))')
-        ->assertSeeHtml('color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute)); border-color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))')
-        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-refused), var(--color-ink-muted) var(--stage-mute))');
+        // Цвет этапа: колонка с оттенком цвета этапа, список этапа на карточке — цвет этапа (приглушается --stage-mute)
+        ->assertSeeHtml('background-color: color-mix(in srgb, var(--color-stage-booked) 6%, var(--color-surface))')
+        ->assertSeeHtml('color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute)); border-color:')
+        ->assertSeeHtml('color: color-mix(in srgb, var(--color-stage-refused), var(--color-ink-muted) var(--stage-mute)); border-color:');
 
     $this->get(route('counterparties.index'))->assertOk()->assertSee('Новый контрагент');
 });
@@ -53,8 +53,8 @@ it('recolors the card after a stage change', function () {
 
     Livewire::test(CounterpartyBoard::class)
         ->call('changeStage', $card->id, CounterpartyStage::Cooperating->value)
-        ->assertSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-new), var(--color-ink-muted) var(--stage-mute))')
-        ->assertDontSeeHtml('border-left: 4px solid color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute))');
+        ->assertSeeHtml('color: color-mix(in srgb, var(--color-stage-new), var(--color-ink-muted) var(--stage-mute)); border-color:')
+        ->assertDontSeeHtml('color: color-mix(in srgb, var(--color-stage-booked), var(--color-ink-muted) var(--stage-mute)); border-color:');
 });
 
 it('puts a new counterparty at the end of its column', function () {

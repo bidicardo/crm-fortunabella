@@ -2,6 +2,7 @@
 
 use App\Livewire\ClientTable;
 use App\Models\Client;
+use App\Models\Deal;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -115,4 +116,15 @@ it('redirects guests to login', function () {
     auth()->logout();
 
     $this->get('/clients')->assertRedirect('/login');
+});
+
+it('marks clients with deals and filters by deals', function () {
+    $withDeals = Client::factory()->create(['name' => 'Со сделками']);
+    Deal::factory()->count(2)->for($withDeals)->create();
+    Client::factory()->create(['name' => 'Без сделок']);
+
+    Livewire::test(ClientTable::class)->assertSee('2 сделки');
+    expect(names(Livewire::test(ClientTable::class)->set('deals', 'with')))->toBe(['Со сделками'])
+        ->and(names(Livewire::test(ClientTable::class)->set('deals', 'without')))->toBe(['Без сделок'])
+        ->and(Livewire::test(ClientTable::class)->set('deals', 'nonsense')->viewData('clients')->count())->toBe(2);
 });

@@ -53,10 +53,11 @@ CRM для управления клиентами, сделками-мероп�
   задаётся `#[Title('...')]` — название раздела в верхней панели.
 - Общие сервисы: `PhoneNormalizer` (телефон), `DuplicateFinder` (поиск дублей),
   `ClientMergeService` (слияние; связи для переноса — `relations()`),
-  `RecordDeleter` (удаление клиента/контрагента; счётчик сделок — `dealsCount()`), трейт
+  `RecordDeleter` (удаление клиента, контрагента, сделки; счётчик сделок — `dealsCount()`), трейт
   `LogsActivity` (история изменений моделей). Для карточек Livewire — трейты
   `EditsFieldsInline` (правка по полю) и `WithActivityHistory` (блок истории,
-  лента — `<x-activity-history>`) в `app/Livewire/Concerns`.
+  лента — `<x-activity-history>`) в `app/Livewire/Concerns`; перенос карточек канбана —
+  `MovesKanbanCards` (контрагенты и сделки).
 - Вёрстка для iPhone (шрифт полей 16 px, `min-h-dvh`, безопасная зона, без
   горизонтальной прокрутки страницы) — `docs/16-pwa-and-mobile.md`.
 - Дизайн-система (Д1 выполнена): цвета, шрифт Inter, скругления, тени — токены в
@@ -75,8 +76,9 @@ CRM для управления клиентами, сделками-мероп�
   `<x-ui.table class="min-h-0 flex-1 overflow-y-auto">` (до низа экрана) с `sticky top-0` шапкой,
   пагинация под ней всегда видна; название/имя в первой колонке — одна строка `max-w-64 truncate` с
   полным текстом в `title`; панель над таблицей на телефоне — две строки, кнопка создания «+ Новый»
-  (полный текст от `sm` и в `aria-label`). Образцы — `client-table.blade.php`,
-  `counterparty-table.blade.php`; так же — будущие списки (сделки). Верхняя панель каркаса закреплена
+  (полный текст от `sm` и в `aria-label`). Массовое удаление — флажки и «Удалить
+  выбранные» (трейт `DeletesSelected`, панель `livewire/partials/bulk-bar`). Образцы —
+  `client-table.blade.php`, `counterparty-table.blade.php`, `deal-table.blade.php`. Верхняя панель каркаса закреплена
   (`sticky`). Полосы прокрутки скрыты и «оттягивание» за край
   (`overscroll-behavior: none`) выключено везде — правило `*` в `app.css` (решение владельца).
 - Подводные камни вёрстки (на них уже были ошибки):

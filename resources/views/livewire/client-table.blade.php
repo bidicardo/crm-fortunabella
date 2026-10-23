@@ -31,6 +31,8 @@
         <x-ui.alert kind="success">{{ session('status') }}</x-ui.alert>
     @endif
 
+    @include('livewire.partials.bulk-bar', ['confirm' => 'Удалить выбранных клиентов вместе с влитыми в них дублями'])
+
     {{-- Телефон — две строки: [поиск, «Только архивные»] и [тип, «Колонки», «+ Новый»]; от sm — всё в одну строку. --}}
     <div class="flex flex-wrap items-center gap-3">
         <div class="flex w-full items-center gap-3 sm:w-auto">
@@ -52,6 +54,15 @@
                     @foreach ($legalTypes as $type)
                         <option value="{{ $type->value }}">{{ $type->label() }}</option>
                     @endforeach
+                </x-ui.select>
+            </div>
+
+            {{-- Фильтр по сделкам — от sm (на телефоне панель не поместилась бы в две строки) --}}
+            <div class="min-w-0 max-sm:hidden sm:flex-initial">
+                <x-ui.select wire:model.live="deals" aria-label="Сделки">
+                    <option value="">Все клиенты</option>
+                    <option value="with">Со сделками</option>
+                    <option value="without">Без сделок</option>
                 </x-ui.select>
             </div>
 
@@ -80,6 +91,12 @@
     <x-ui.table class="min-h-0 flex-1 overflow-y-auto" wire:key="clients-{{ $clients->currentPage() }}-{{ $sort }}-{{ $dir }}">
         <thead class="sticky top-0 z-10 bg-surface">
             <tr>
+                @if (! $onlyArchived)
+                    @php($pageIds = $clients->pluck('id')->map(fn ($id) => (string) $id)->all())
+                    <th class="w-10 pl-3">
+                        <x-ui.checkbox id="select-page" :checked="$pageIds && ! array_diff($pageIds, $selected)" wire:click="togglePage(@js($pageIds))"><span class="sr-only">Выбрать все на странице</span></x-ui.checkbox>
+                    </th>
+                @endif
                 @foreach (['name' => 'Имя'] + $columns as $key => $label)
                     <th
                         class="whitespace-nowrap px-4 py-2 text-caption font-semibold"
@@ -103,10 +120,18 @@
         <tbody>
             @forelse ($clients as $client)
                 <tr wire:key="client-{{ $client->id }}" class="border-t border-line">
-                    {{-- Имя в одну строку не шире max-w-64, длиннее — многоточие; полностью — подсказкой --}}
+                    @if (! $onlyArchived)
+                        <td class="w-10 pl-3">
+                            <x-ui.checkbox id="select-{{ $client->id }}" value="{{ $client->id }}" :checked="in_array((string) $client->id, $selected, true)" wire:model.live="selected"><span class="sr-only">Выбрать {{ $client->name }}</span></x-ui.checkbox>
+                        </td>
+                    @endif
+                    {{-- Имя в одну строку не шире max-w-64, длиннее — многоточие; полностью — подсказкой. Рядом метки: число сделок (зелёная) и «архив». --}}
                     <td class="px-4 py-2">
-                        <div class="flex max-w-64 items-center gap-1">
-                            <a href="{{ route('clients.show', $client) }}" title="{{ $client->name }}" class="focus-ring link min-w-0 truncate font-medium">{{ $client->name }}</a>
+                        <div class="flex items-center gap-1.5">
+                            <a href="{{ route('clients.show', $client) }}" title="{{ $client->name }}" class="focus-ring link min-w-0 max-w-64 truncate font-medium">{{ $client->name }}</a>
+                            @if ($client->deals_count)
+                                <x-ui.badge tone="success" class="shrink-0" title="Есть сделки">{{ App\Models\Deal::countLabel($client->deals_count) }}</x-ui.badge>
+                            @endif
                             @if ($client->isArchived())
                                 <x-ui.badge class="shrink-0">архив</x-ui.badge>
                             @endif
@@ -122,7 +147,7 @@
                 </tr>
             @empty
                 <tr class="border-t border-line">
-                    <td colspan="{{ count($columns) + 1 }}">
+                    <td colspan="{{ count($columns) + 2 }}">
                         <x-ui.empty-state icon="search" title="Клиентов не найдено" />
                     </td>
                 </tr>

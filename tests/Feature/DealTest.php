@@ -117,7 +117,7 @@ it('shows every field in the history with a Russian label and a readable value',
         ->and($deal->activityValue('sold_by_id', 999))->toBe('№ 999')
         ->and($deal->activityLabel('sold_by_id'))->toBe('Кто продал');
 
-    $deal->update(['amount' => 99000]);
+    $deal->update(['amount' => 12345]); // фабрика даёт суммы кратные 1000 — значение точно новое
     expect($deal->activityLogs()->where('event', 'updated')->sole()->changes)->toHaveKey('amount');
 });
 

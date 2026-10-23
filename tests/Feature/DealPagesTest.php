@@ -136,7 +136,8 @@ describe('card', function () {
     });
 
     it('edits plain fields one by one and logs them', function () {
-        $deal = Deal::factory()->create(['event_time' => '18:00']);
+        // Источник задан явно: фабрика выбирает его случайно, и «Авито» → «Авито» не дало бы записи в истории.
+        $deal = Deal::factory()->create(['event_time' => '18:00', 'lead_source' => 'site']);
         $card = Livewire::test(DealShow::class, ['deal' => $deal]);
 
         $card->call('edit', 'title')->set('value', 'Новое название')->call('save')->assertHasNoErrors()
@@ -234,18 +235,18 @@ describe('card', function () {
         $this->get(route('deals.show', ['deal' => $deal, 'tab' => 'notes']))->assertSee('Важное примечание');
     });
 
-    it('deletes a deal with its history after confirmation and returns home with a message', function () {
+    it('deletes a deal with its history after confirmation and returns to the kanban with a message', function () {
         $deal = Deal::factory()->create(['title' => 'Удаляемая']);
         $deal->update(['amount' => 1000]);
 
         Livewire::test(DealShow::class, ['deal' => $deal])
             ->assertSeeHtml('wire:confirm="Удалить сделку «Удаляемая» вместе с историей изменений?')
             ->call('destroy')
-            ->assertRedirect(route('home'));
+            ->assertRedirect(route('deals.index'));
 
         expect(Deal::count())->toBe(0)
             ->and(ActivityLog::where('subject_type', $deal->getMorphClass())->count())->toBe(0);
-        $this->get(route('home'))->assertSee('Сделка удалена.');
+        $this->get(route('deals.index'))->assertSee('Сделка удалена.');
     });
 
     it('escapes user input on the card', function () {

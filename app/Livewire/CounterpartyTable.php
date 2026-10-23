@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\CounterpartyStage;
+use App\Livewire\Concerns\DeletesSelected;
 use App\Models\Counterparty;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Locked;
@@ -17,7 +18,7 @@ use Livewire\WithPagination;
  */
 class CounterpartyTable extends Component
 {
-    use WithPagination;
+    use DeletesSelected, WithPagination;
 
     private const SORTABLE = ['name', 'cooperation_started_at', 'created_at', 'updated_at'];
 
@@ -49,6 +50,11 @@ class CounterpartyTable extends Component
     public function updatedStage(): void
     {
         $this->resetPage();
+    }
+
+    protected function deletableQuery(): Builder
+    {
+        return Counterparty::query();
     }
 
     public function sortBy(string $column): void

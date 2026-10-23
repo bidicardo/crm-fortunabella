@@ -10,16 +10,17 @@ it('shows only existing sections in the menu', function () {
         ->assertSee('aria-label="Основное меню"', false)
         ->assertSee('Главная')
         ->assertSee('Клиенты')
-        ->assertDontSee('Сделки');
+        ->assertSee('Сделки')
+        ->assertDontSee('Задачи');
 });
 
 it('shows a menu item when its route appears', function () {
-    Route::middleware('web')->get('/deals', fn () => 'ok')->name('deals.index');
+    Route::middleware('web')->get('/tasks', fn () => 'ok')->name('tasks.index');
     Route::getRoutes()->refreshNameLookups();
 
     $this->actingAs(User::factory()->create())->get('/')
-        ->assertSee('Сделки')
-        ->assertSee('Продажи');
+        ->assertSee('Задачи')
+        ->assertSee('Работа');
 });
 
 it('marks the active item with aria-current', function () {

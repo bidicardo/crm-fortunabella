@@ -125,6 +125,51 @@ class Deal extends Model
         $query->where('stage', $stage);
     }
 
+    /**
+     * «N сделка/сделки/сделок» по правилам русского языка. trans_choice() для строки без перевода берёт правила
+     * запасного языка (en) и даёт «5 сделки», поэтому — своя формула.
+     */
+    public static function countLabel(int $n): string
+    {
+        $forms = ['сделка', 'сделки', 'сделок'];
+        [$m10, $m100] = [$n % 10, $n % 100];
+        $form = match (true) {
+            $m10 === 1 && $m100 !== 11 => 0,
+            $m10 >= 2 && $m10 <= 4 && ($m100 < 12 || $m100 > 14) => 1,
+            default => 2,
+        };
+
+        return $n.' '.$forms[$form];
+    }
+
+    /**
+     * Поиск без учёта регистра по названию и адресу сделки, по клиенту (как в списке клиентов: имя, телефон
+     * в любом написании, email…) и по названию контрагента; %, _ и ! экранируются.
+     */
+    public function scopeSearch(Builder $query, string $term): void
+    {
+        $like = '%'.str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $term).'%';
+
+        $query->where(fn (Builder $q) => $q
+            ->whereRaw("title like ? escape '!'", [$like])
+            ->orWhereRaw("address like ? escape '!'", [$like])
+            ->orWhereHas('client', fn (Builder $c) => $c->search($term))
+            ->orWhereHas('counterparty', fn (Builder $c) => $c->whereRaw("name like ? escape '!'", [$like])));
+    }
+
+    /** Коротко для узких мест (плитки на телефоне): 950 → «950 ₽», 1500 → «1,5 тыс ₽», 1250000 → «1,25 млн ₽». */
+    public static function moneyShort(int $value): string
+    {
+        // Тысячи — до одного знака, миллионы — до двух; 999 999 округляется в «1 млн», а не «1000 тыс».
+        [$number, $unit] = match (true) {
+            round($value / 1_000, 1) >= 1_000 => [round($value / 1_000_000, 2), ' млн ₽'],
+            $value >= 1_000 => [round($value / 1_000, 1), ' тыс ₽'],
+            default => [$value, ' ₽'],
+        };
+
+        return str_replace('.', ',', (string) $number).$unit;
+    }
+
     /** Целые рубли с разрядами: 1250000 → «1 250 000 ₽». */
     public static function money(?int $value): ?string
     {

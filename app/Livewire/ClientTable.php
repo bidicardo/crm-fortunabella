@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\ClientLegalType;
+use App\Livewire\Concerns\DeletesSelected;
 use App\Models\Client;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Title;
@@ -13,7 +14,7 @@ use Livewire\WithPagination;
 #[Title('Клиенты')]
 class ClientTable extends Component
 {
-    use WithPagination;
+    use DeletesSelected, WithPagination;
 
     private const SORTABLE = ['name', 'created_at', 'updated_at'];
 
@@ -25,6 +26,10 @@ class ClientTable extends Component
 
     #[Url(as: 'archived')]
     public bool $onlyArchived = false;
+
+    /** Фильтр по сделкам: '' — все, with — со сделками, without — без сделок. */
+    #[Url(as: 'deals')]
+    public string $deals = '';
 
     #[Url]
     public string $sort = 'created_at';
@@ -47,6 +52,17 @@ class ClientTable extends Component
         $this->resetPage();
     }
 
+    public function updatedDeals(): void
+    {
+        $this->resetPage();
+    }
+
+    // Массово удаляются только действующие клиенты (архивный дубль удаляется вместе со своим основным).
+    protected function deletableQuery(): Builder
+    {
+        return Client::active();
+    }
+
     public function sortBy(string $column): void
     {
         if (! in_array($column, self::SORTABLE, true)) {
@@ -65,6 +81,10 @@ class ClientTable extends Component
         $dir = $this->dir === 'asc' ? 'asc' : 'desc';
 
         $clients = Client::query()
+            // Число сделок — для метки у имени (одним подзапросом, без N+1).
+            ->withCount('deals')
+            ->when($this->deals === 'with', fn (Builder $q) => $q->has('deals'))
+            ->when($this->deals === 'without', fn (Builder $q) => $q->doesntHave('deals'))
             ->when($this->onlyArchived, fn (Builder $q) => $q->whereNotNull('archived_at'), fn (Builder $q) => $q->active())
             ->when(ClientLegalType::tryFrom($this->legalType), fn (Builder $q, ClientLegalType $type) => $q->where('legal_type', $type))
             ->when($term !== '', fn (Builder $q) => $q->search($term))
