@@ -13,7 +13,8 @@
      должен иметь методы edit(поле), save(), cancel() и черновик $value — трейт App\Livewire\Concerns\EditsFieldsInline.
      type: text | tel | email | textarea | select (варианты select — в слоте options).
      Сохранение — Enter (в textarea — Ctrl/Cmd+Enter), кнопка ✓ или выбор варианта в списке;
-     отмена — Esc или ✕. Содержимое слота — значение для просмотра, пустое показывается как «—». --}}
+     отмена — Esc или ✕. Содержимое слота — значение для просмотра, пустое показывается как «—».
+     Слот aside — значок рядом с подписью (например, предупреждение о занятой дате сделки). --}}
 @php
     $multiline = $type === 'textarea';
     $id = $idPrefix.$field;
@@ -22,12 +23,13 @@
 @endphp
 
 <div {{ $attributes->merge(['class' => 'min-w-0']) }}>
-    <dt class="mb-1 text-body text-ink">
+    <dt class="mb-1 flex min-h-6 items-center gap-1 text-body text-ink">
         @if ($editing)
             <label for="{{ $id }}">{{ $label }}</label>
         @else
-            {{ $label }}
+            <span>{{ $label }}</span>
         @endif
+        {{ $aside ?? '' }}
     </dt>
     <dd>
         @if ($editing)

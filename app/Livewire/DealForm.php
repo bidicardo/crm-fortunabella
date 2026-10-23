@@ -186,6 +186,7 @@ class DealForm extends Component
             'client' => $this->client_id ? Client::find($this->client_id) : null,
             'counterparty' => $this->counterparty_id ? Counterparty::find($this->counterparty_id) : null,
             'duplicateClients' => $this->duplicates ? Client::whereKey($this->duplicates)->get() : collect(),
+            'sameDay' => $this->stage === DealStage::Refused->value ? collect() : Deal::othersOn($this->event_date),
             'stages' => DealStage::cases(),
             'sources' => LeadSource::cases(),
             'tableTypes' => TableType::cases(),

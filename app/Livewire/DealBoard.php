@@ -97,6 +97,8 @@ class DealBoard extends Component
             }),
             'stages' => DealStage::cases(),
             'analytics' => self::analytics(),
+            // Занятые даты — по уже загруженным карточкам, без запросов.
+            'sameDay' => Deal::sameDayOthers($cards, $cards),
         ])->title('Сделки');
     }
 }

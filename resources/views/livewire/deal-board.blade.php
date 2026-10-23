@@ -164,9 +164,13 @@
 
                             @if ($card->event_date || $source || $prepayment)
                                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-caption text-ink-secondary">
-                                    {{-- Место под метку занятой даты (задача 29) — рядом с датой --}}
                                     @if ($card->event_date)
-                                        <span class="inline-flex items-center gap-1 tabular-nums [.hide-date_&]:hidden"><x-icon name="calendar" class="h-3.5 w-3.5 shrink-0" />{{ trim($card->event_date->format('d.m.Y').' '.$card->event_time) }}</span>
+                                        <span class="inline-flex items-center gap-1 tabular-nums [.hide-date_&]:hidden"><x-icon name="calendar" class="h-3.5 w-3.5 shrink-0" />{{ trim($card->event_date->format('d.m.Y').' '.$card->event_time) }}
+                                            {{-- Занятая дата; wire:sort:ignore — нажатие на значок не начинает перенос --}}
+                                            @if ($sameDay->has($card->id))
+                                                <span wire:sort:ignore class="-my-1"><x-deal-date-conflict :deals="$sameDay[$card->id]" /></span>
+                                            @endif
+                                        </span>
                                     @endif
                                     @if ($source)
                                         <span class="[.hide-source_&]:hidden">{{ $source }}</span>

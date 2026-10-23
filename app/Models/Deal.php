@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 /** Сделка = мероприятие (docs/10-deals.md). stage и position не в fillable: их меняет только moveTo(). */
@@ -140,6 +141,52 @@ class Deal extends Model
         };
 
         return $n.' '.$forms[$form];
+    }
+
+    /**
+     * Занятые даты (docs/05): для каждой сделки набора — другие сделки в тот же день, кроме «Отказа»; у сделок
+     * в «Отказе» и без даты предупреждения нет. Результат: id сделки => коллекция других сделок (с клиентом),
+     * только непустые. $pool — уже загруженные сделки (канбан: без запросов); без него — один запрос.
+     * ponytail: запрос берёт все сделки между первой и последней датой набора — хватает для страницы списка;
+     * при тысячах сделок — whereIn по точным датам.
+     */
+    public static function sameDayOthers(Collection $deals, ?Collection $pool = null): Collection
+    {
+        $dated = $deals->filter(fn (self $deal) => $deal->event_date && $deal->stage !== DealStage::Refused);
+
+        if ($dated->isEmpty()) {
+            return collect();
+        }
+
+        $dates = $dated->map(fn (self $deal) => $deal->event_date->toDateString());
+        $pool ??= static::with('client:id,name')
+            ->whereNotNull('event_date')
+            ->whereBetween('event_date', [$dates->min(), $dates->max().' 23:59:59'])
+            ->get();
+
+        $byDate = $pool
+            ->filter(fn (self $deal) => $deal->event_date && $deal->stage !== DealStage::Refused)
+            ->sortBy(fn (self $deal) => (string) $deal->event_time)
+            ->groupBy(fn (self $deal) => $deal->event_date->toDateString());
+
+        return $dated->mapWithKeys(fn (self $deal) => [
+            $deal->id => ($byDate[$deal->event_date->toDateString()] ?? collect())->where('id', '!=', $deal->id)->values(),
+        ])->filter(fn (Collection $others) => $others->isNotEmpty());
+    }
+
+    /** Другие сделки (кроме «Отказа») на дату — для карточки и формы создания; $exceptId — сама сделка. */
+    public static function othersOn(mixed $date, ?int $exceptId = null): Collection
+    {
+        if (blank($date)) {
+            return collect();
+        }
+
+        return static::with('client:id,name')
+            ->where('stage', '!=', DealStage::Refused)
+            ->whereDate('event_date', Carbon::parse($date)->toDateString())
+            ->when($exceptId, fn (Builder $q) => $q->whereKeyNot($exceptId))
+            ->orderBy('event_time')
+            ->get();
     }
 
     /**

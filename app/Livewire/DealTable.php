@@ -86,11 +86,14 @@ class DealTable extends Component
     public function render()
     {
         $deals = $this->listQuery()->paginate(25);
+        // Занятые даты для строк страницы — одним запросом.
+        $sameDay = Deal::sameDayOthers($deals->getCollection());
 
         return view('livewire.deal-table', [
             'deals' => $deals,
             'stages' => DealStage::cases(),
             'sources' => LeadSource::cases(),
+            'sameDay' => $sameDay,
         ])->title('Сделки');
     }
 }

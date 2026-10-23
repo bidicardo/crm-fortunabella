@@ -163,6 +163,8 @@ class DealShow extends Component
             'sources' => LeadSource::cases(),
             'tableTypeOptions' => TableType::cases(),
             'tabs' => self::TABS,
+            // Занятая дата: другие сделки в тот же день (у сделки в «Отказе» предупреждения нет).
+            'sameDay' => $this->deal->stage === DealStage::Refused ? collect() : Deal::othersOn($this->deal->event_date, $this->deal->id),
         ])->title('Сделка');
     }
 }

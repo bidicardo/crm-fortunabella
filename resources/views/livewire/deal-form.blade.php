@@ -68,7 +68,13 @@
             <x-ui.input id="amount" label="Сумма, ₽" type="number" min="0" inputmode="numeric" placeholder="Целые рубли" wire:model="amount" />
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                <x-ui.input id="event_date" label="Дата проведения" type="date" wire:model="event_date" />
+                <div class="flex items-end gap-1">
+                    <div class="min-w-0 flex-1">
+                        <x-ui.input id="event_date" label="Дата проведения" type="date" wire:model.live="event_date" />
+                    </div>
+                    {{-- Занятая дата — предупреждение, сохранение не блокируется --}}
+                    <div class="pb-2"><x-deal-date-conflict :deals="$sameDay" /></div>
+                </div>
                 <x-ui.input id="event_time" label="Время" type="time" wire:model="event_time" />
             </div>
 

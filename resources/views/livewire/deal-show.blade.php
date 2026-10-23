@@ -107,7 +107,10 @@
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                    <x-ui.editable-field label="Дата проведения" field="event_date" type="date" :editing="$editing === 'event_date'">{{ $deal->event_date?->format('d.m.Y') }}</x-ui.editable-field>
+                    <x-ui.editable-field label="Дата проведения" field="event_date" type="date" :editing="$editing === 'event_date'">
+                        {{ $deal->event_date?->format('d.m.Y') }}
+                        <x-slot:aside><x-deal-date-conflict :deals="$sameDay" /></x-slot:aside>
+                    </x-ui.editable-field>
                     <x-ui.editable-field label="Время" field="event_time" type="time" :editing="$editing === 'event_time'">{{ $deal->event_time }}</x-ui.editable-field>
                 </div>
 

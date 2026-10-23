@@ -129,7 +129,13 @@
                     <td class="px-4 py-2" x-show="cols.client"><a href="{{ route('clients.show', $deal->client_id) }}" class="focus-ring link">{{ $deal->client->name }}</a></td>
                     <td class="px-4 py-2" x-show="cols.counterparty">{{ $deal->counterparty?->name }}</td>
                     <td class="whitespace-nowrap px-4 py-2" x-show="cols.stage"><x-ui.badge :tone="$deal->stage->tone()">{{ $deal->stage->label() }}</x-ui.badge></td>
-                    <td class="whitespace-nowrap px-4 py-2 tabular-nums" x-show="cols.event_date">{{ $deal->event_date ? trim($deal->event_date->format('d.m.Y').' '.$deal->event_time) : '' }}</td>
+                    <td class="whitespace-nowrap px-4 py-2 tabular-nums" x-show="cols.event_date">
+                        <span class="inline-flex items-center gap-1">{{ $deal->event_date ? trim($deal->event_date->format('d.m.Y').' '.$deal->event_time) : '' }}
+                            @if ($sameDay->has($deal->id))
+                                <x-deal-date-conflict :deals="$sameDay[$deal->id]" />
+                            @endif
+                        </span>
+                    </td>
                     <td class="whitespace-nowrap px-4 py-2 tabular-nums" x-show="cols.amount">{{ App\Models\Deal::money($deal->amount) }}</td>
                     <td class="whitespace-nowrap px-4 py-2" x-show="cols.prepayment">
                         @if ($deal->prepayment_amount !== null || $deal->prepayment_paid)
